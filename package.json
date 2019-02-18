@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nizarrk/skripsi.git"
+    "url": "git+https://github.com/framework7io/framework7-template-vue-webpack.git"
   },
   "keywords": [
     "ios",
