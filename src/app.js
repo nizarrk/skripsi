@@ -16,6 +16,10 @@ import AppStyles from './css/app.css';
 
 // Import App Component
 import App from './app.vue';
+import Tabbar from './pages/tabbar.vue'
+
+Vue.component('tabbar', Tabbar);
+
 
 // Init F7 Vue Plugin
 Framework7.use(Framework7Vue)

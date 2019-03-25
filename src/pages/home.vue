@@ -2,7 +2,7 @@
   <f7-page>
     <f7-navbar>
       <f7-nav-left>
-        <f7-link icon-if-ios="f7:menu" icon-if-md="material:menu" panel-open="left"></f7-link>
+        <f7-link icon-ios="f7:menu" icon-md="material:menu" panel-open="left"></f7-link>
       </f7-nav-left>
       <f7-nav-title>My App</f7-nav-title>
       <f7-nav-right>
@@ -15,6 +15,7 @@
       search-in=".item-title"
     ></f7-searchbar>
     </f7-navbar>
+    <f7-tab id="tab-1"></f7-tab>
     <f7-card class="demo-facebook-card">
   <f7-card-header class="no-border">
     <div class="demo-facebook-avatar"><img src="https://cdn.framework7.io/placeholder/people-68x68-1.jpg" width="34" height="34"/></div>
@@ -47,22 +48,50 @@
     <f7-link>Share</f7-link>
   </f7-card-footer>
 </f7-card>
-<f7-toolbar tabbar labels :position="isBottom ? 'bottom' : 'top'">
-      <f7-link tab-link="#tab-1" tab-link-active text="Home" icon-ios="f7:home" icon-md="material:home"></f7-link>
-      <f7-link tab-link="#tab-2" text="Info" icon-ios="f7:info" icon-md="material:info"></f7-link>
-      <f7-link tab-link="#tab-3" text="Lapor" icon-ios="f7:add" icon-md="material:add"></f7-link>
-      <f7-link tab-link="#tab-4" text="Trayek" icon-ios="f7:navigation" icon-md="material:navigation"></f7-link>
-      <f7-link tab-link="#tab-5" text="Akun" icon-ios="f7:person" icon-md="material:person"></f7-link>
-    </f7-toolbar>
-
   </f7-page>
 </template>
 <script>
+
 export default {
     data() {
       return {
-        isBottom: true,
       };
     }
   }
 </script>
+<style scoped>
+.demo-facebook-card .card-header {
+  display: block;
+  padding: 10px;
+}
+.demo-facebook-card .demo-facebook-avatar {
+  float: left;
+}
+.demo-facebook-card .demo-facebook-name {
+  margin-left: 44px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.demo-facebook-card .demo-facebook-date {
+  margin-left: 44px;
+  font-size: 13px;
+  color: #8e8e93;
+}
+.demo-facebook-card .card-footer {
+  background: #fafafa;
+}
+.demo-facebook-card .card-footer a {
+  color: #81848b;
+  font-weight: 500;
+}
+.demo-facebook-card .card-content img {
+  display: block;
+}
+.demo-facebook-card .card-content-padding {
+  padding: 15px 10px;
+}
+.demo-facebook-card .card-content-padding .likes {
+  color: #8e8e93;
+}
+</style>
+
