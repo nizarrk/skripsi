@@ -32,6 +32,7 @@ module.exports = {
     open: true,
     compress: true,
     contentBase: '/www/',
+    host: '192.168.1.11',
     watchOptions: {
       poll: true
     }
