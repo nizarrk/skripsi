@@ -5,33 +5,14 @@ import DynamicRoutePage from './pages/dynamic-route.vue';
 import NotFoundPage from './pages/not-found.vue';
 import Profile from './pages/profile.vue';
 import TabRoute from './pages/tabs-routable.vue';
+import TabSwipe from './pages/tabs-swipeable.vue';
 
 import PanelLeftPage from './pages/panel-left.vue';
 import PanelRightPage from './pages/panel-right.vue';
 
 export default [
   {
-    path: '/',
-    component: HomePage,
-  },
-  {
-    path: '/panel-left/',
-    component: PanelLeftPage,
-  },
-  {
-    path: '/panel-right/',
-    component: PanelRightPage,
-  },
-  {
-    path: '/about/',
-    component: AboutPage,
-  },
-  {
-    path: '/profile/',
-    component: Profile,
-  },
-  {
-    path: '/tabs-routable/',
+    path: '/home/',
     component: TabRoute,
     tabs: [
       {
@@ -50,6 +31,26 @@ export default [
         component: AboutPage,
       },
 ],
+  },
+  {
+    path: '/panel-left/',
+    component: PanelLeftPage,
+  },
+  {
+    path: '/panel-right/',
+    component: PanelRightPage,
+  },
+  {
+    path: '/about/',
+    component: AboutPage,
+  },
+  {
+    path: '/profile/',
+    component: Profile,
+  },
+  {
+    path: '/tab-swipe/',
+    component: TabSwipe,
   },
   {
     path: '/form/',
