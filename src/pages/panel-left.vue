@@ -15,6 +15,7 @@
       <f7-list-item link="/form/" title="Form" view="#main-view" panel-close></f7-list-item>
       <f7-list-item link="/profile/" title="Profile" view="#main-view" panel-close></f7-list-item>
       <f7-list-item link="/tab-swipe/" title="Tabs Swipe" view="#main-view" panel-close></f7-list-item>
+      <f7-list-item link="/themes/" title="Color Themes" view="#main-view" panel-close></f7-list-item>
       <f7-list-item link="#login-screen" title="Login Screen" view="#main-view" fill raised login-screen-open="#login-screen" panel-close></f7-list-item>
     </f7-list>
   </f7-page>

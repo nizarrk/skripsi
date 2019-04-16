@@ -6,6 +6,11 @@ import NotFoundPage from './pages/not-found.vue';
 import Profile from './pages/profile.vue';
 import TabRoute from './pages/tabs-routable.vue';
 import TabSwipe from './pages/tabs-swipeable.vue';
+import Info from './pages/info.vue';
+import Themes from './pages/color-theme.vue';
+import Settings from './pages/settings.vue';
+import EditProfile from './pages/edit-profile.vue';
+import Notifications from './pages/notifications.vue';
 
 import PanelLeftPage from './pages/panel-left.vue';
 import PanelRightPage from './pages/panel-right.vue';
@@ -23,12 +28,22 @@ export default [
       {
         path: '/tab2/',
         id: 'tab2',
-        component: Profile,
+        component: Info,
       },
       {
         path: '/tab3/',
         id: 'tab3',
-        component: AboutPage,
+        component: Info,
+      },
+      {
+        path: '/tab4/',
+        id: 'tab4',
+        component: Notifications,
+      },
+      {
+        path: '/tab5/',
+        id: 'tab5',
+        component: Profile,
       },
 ],
   },
@@ -47,6 +62,22 @@ export default [
   {
     path: '/profile/',
     component: Profile,
+  },
+  {
+    path: '/info/',
+    component: Info,
+  },
+  {
+    path: '/themes/',
+    component: Themes,
+  },
+  {
+    path: '/settings/',
+    component: Settings,
+  },
+  {
+    path: '/edit-profile/',
+    component: EditProfile,
   },
   {
     path: '/tab-swipe/',
