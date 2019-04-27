@@ -39,16 +39,16 @@
         </f7-block>
         <f7-block>
           <f7-list>
-            <f7-list-item link="#" title="Laporan Keluhan" badge="0">
+            <f7-list-item link="/report-list/" title="Laporan Keluhan" badge="0">
               <f7-icon slot="media" md="material:report"></f7-icon>
             </f7-list-item>
-            <f7-list-item link="#" title="Peminjaman Jalan">
+            <f7-list-item link="/pinjam-jalan/" title="Peminjaman Jalan">
               <f7-icon slot="media" md="material:note_add"></f7-icon>
             </f7-list-item>
             <f7-list-item link="#" title="Survey Kepuasan Masyarakat">
               <f7-icon slot="media" md="material:assignment"></f7-icon>
             </f7-list-item>
-            <f7-list-item link="#" title="Kritik dan Saran">
+            <f7-list-item link="/kritik-saran/" title="Kritik dan Saran">
               <f7-icon slot="media" md="material:textsms"></f7-icon>
             </f7-list-item>
           </f7-list>

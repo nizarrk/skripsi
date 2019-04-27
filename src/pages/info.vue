@@ -3,9 +3,9 @@
     <f7-navbar title="Info" back-link="Back">      
     </f7-navbar>
     <f7-toolbar tabbar top>
-      <f7-link tab-link="#tab-1" tab-link-active>Berita</f7-link>
-      <f7-link tab-link="#tab-2">Trayek</f7-link>
-      <f7-link tab-link="#tab-3">Parkir</f7-link>
+      <f7-link tab-link="#tab-1" tab-link-active style="text-transform: capitalize;">Berita</f7-link>
+      <f7-link tab-link="#tab-2" style="text-transform: capitalize;">Trayek</f7-link>
+      <f7-link tab-link="#tab-3" style="text-transform: capitalize;">Parkir</f7-link>
     </f7-toolbar>
 
     <f7-tabs swipeable>

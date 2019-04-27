@@ -11,6 +11,12 @@ import Themes from './pages/color-theme.vue';
 import Settings from './pages/settings.vue';
 import EditProfile from './pages/edit-profile.vue';
 import Notifications from './pages/notifications.vue';
+import Report from './pages/report.vue';
+import ReportList from './pages/report-list.vue';
+import ReportDetail from './pages/report-detail.vue';
+import Comments from './pages/comments.vue';
+import PinjamJalan from './pages/pinjam-jalan.vue';
+import KritikSaran from './pages/kritik-saran.vue';
 
 import PanelLeftPage from './pages/panel-left.vue';
 import PanelRightPage from './pages/panel-right.vue';
@@ -33,7 +39,7 @@ export default [
       {
         path: '/tab3/',
         id: 'tab3',
-        component: Info,
+        component: Report,
       },
       {
         path: '/tab4/',
@@ -78,6 +84,26 @@ export default [
   {
     path: '/edit-profile/',
     component: EditProfile,
+  },
+  {
+    path: '/report-list/',
+    component: ReportList,
+  },
+  {
+    path: '/report-detail/',
+    component: ReportDetail,
+  },
+  {
+    path: '/comments/',
+    component: Comments,
+  },
+  {
+    path: '/pinjam-jalan/',
+    component: PinjamJalan,
+  },
+  {
+    path: '/kritik-saran/',
+    component: KritikSaran,
   },
   {
     path: '/tab-swipe/',
