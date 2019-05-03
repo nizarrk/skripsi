@@ -17,6 +17,7 @@ import ReportDetail from './pages/report-detail.vue';
 import Comments from './pages/comments.vue';
 import PinjamJalan from './pages/pinjam-jalan.vue';
 import KritikSaran from './pages/kritik-saran.vue';
+import Leaflet from './pages/leaflet.vue';
 
 import PanelLeftPage from './pages/panel-left.vue';
 import PanelRightPage from './pages/panel-right.vue';
@@ -86,6 +87,10 @@ export default [
     component: EditProfile,
   },
   {
+    path: '/report/',
+    component: Report,
+  },
+  {
     path: '/report-list/',
     component: ReportList,
   },
@@ -104,6 +109,10 @@ export default [
   {
     path: '/kritik-saran/',
     component: KritikSaran,
+  },
+  {
+    path: '/leaflet/',
+    component: Leaflet,
   },
   {
     path: '/tab-swipe/',
