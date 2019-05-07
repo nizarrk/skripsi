@@ -2,7 +2,7 @@
   <f7-page>
     <f7-navbar title="Sunting Profil" back-link="Back">
         <f7-nav-right>
-            <f7-link icon-ios="f7:save" icon-md="material:save" href="#"></f7-link>
+            <f7-link icon-ios="f7:save" icon-md="material:check" href="#"></f7-link>
           </f7-nav-right>
     </f7-navbar>
     <f7-block>

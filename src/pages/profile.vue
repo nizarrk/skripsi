@@ -45,7 +45,7 @@
             <f7-list-item link="/pinjam-jalan/" title="Peminjaman Jalan">
               <f7-icon slot="media" md="material:note_add"></f7-icon>
             </f7-list-item>
-            <f7-list-item link="#" title="Survey Kepuasan Masyarakat">
+            <f7-list-item link="/survey/" title="Survey Kepuasan Masyarakat">
               <f7-icon slot="media" md="material:assignment"></f7-icon>
             </f7-list-item>
             <f7-list-item link="/kritik-saran/" title="Kritik dan Saran">

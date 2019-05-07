@@ -18,6 +18,7 @@ import Comments from './pages/comments.vue';
 import PinjamJalan from './pages/pinjam-jalan.vue';
 import KritikSaran from './pages/kritik-saran.vue';
 import Leaflet from './pages/leaflet.vue';
+import Survey from './pages/survey.vue';
 
 import PanelLeftPage from './pages/panel-left.vue';
 import PanelRightPage from './pages/panel-right.vue';
@@ -109,6 +110,10 @@ export default [
   {
     path: '/kritik-saran/',
     component: KritikSaran,
+  },
+  {
+    path: '/survey/',
+    component: Survey,
   },
   {
     path: '/leaflet/',
