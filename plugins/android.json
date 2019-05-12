@@ -1,0 +1,21 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "com.skripsi.nrk"
+    },
+    "cordova-plugin-camera": {
+      "PACKAGE_NAME": "com.skripsi.nrk"
+    },
+    "cordova-plugin-file": {
+      "PACKAGE_NAME": "com.skripsi.nrk"
+    }
+  },
+  "dependent_plugins": {}
+}
