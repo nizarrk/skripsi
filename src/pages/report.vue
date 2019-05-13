@@ -201,9 +201,11 @@ var geocodeService = geocoding.geocodeService();
 
         window.resolveLocalFileSystemURL(imagePath, 
           function(fileEntry){
-              alert("got image file entry: " + fileEntry.fullPath);
+              //alert("got image file entry: " + fileEntry.fullPath);
+              self.filename = fileEntry.fullPath.replace("/", "");
               fileEntry.file(function(file){ //should return a raw HTML File Object
                 console.log('dari kamera: ', file);
+                self.getEXIF(file);
               }, 
               self.error); 
           },
@@ -249,7 +251,7 @@ var geocodeService = geocoding.geocodeService();
         
 
         /*Initialize a File Reader object*/
-        let reader  = new FileReader();
+        var reader  = new FileReader();
 
         /*
           Add an event listener to the reader that when the file
@@ -276,8 +278,11 @@ var geocodeService = geocoding.geocodeService();
             reader.readAsDataURL( this.file );
           }
         }
-        //console.log(this.$refs.myimg.src);
-        EXIF.getData(this.file, function() {
+        this.getEXIF(this.file);  
+      },
+      getEXIF(file){
+        let self = this;
+        EXIF.getData(file, function() {
                 console.log('image info', this)
                 console.log('exif data', this.exifdata)
                 self.metadata = this.exifdata;
@@ -303,9 +308,8 @@ var geocodeService = geocoding.geocodeService();
                 self.center = L.latLng(latFinal, lonFinal);
                 var tes = self.reverseGeocode(self.marker);
                 console.log(tes);
-                
-                  })
-        
+
+                  });
       },
       ConvertDMSToDD(degrees, minutes, seconds, direction){
         var dd = degrees + (minutes/60) + (seconds/3600);
