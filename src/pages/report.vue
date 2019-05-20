@@ -2,23 +2,24 @@
   <f7-page>
     <f7-navbar title="Lapor" back-link="Back">
       <f7-nav-right>
-        <f7-link icon-ios="f7:save" icon-md="material:check" href="#"></f7-link>
+        <f7-link icon-ios="f7:save" icon-md="material:check" @click="submitFile"></f7-link>
       </f7-nav-right>
     </f7-navbar>
     <f7-block-title>Unggah Foto</f7-block-title>
       <f7-block>
         <center>
           <div class="image-upload" raised @click="$refs.actionsOneGroup.open()">
-              <f7-icon material="camera_alt" size="100px" v-bind:class="{first: imagePreview}"></f7-icon>
+              <f7-icon material="camera_alt" size="100px" v-bind:class="{first: showPreview}"></f7-icon>
               <img id="myimg" ref="myimg" style="max-width: 200px; max-height: 200px;" 
-              v-bind:class="{preview: imagePreview}" 
+              v-bind:class="{preview: showPreview}" 
               v-bind:src="imagePreview" 
               v-show="showPreview"/>
               <span>{{filename}}</span>
             <f7-actions ref="actionsOneGroup">
               <f7-actions-group>
                 <f7-actions-label bold>Unggah Foto</f7-actions-label>
-                <f7-actions-button @click="galeri">Galeri</f7-actions-button>
+                <f7-actions-button v-if="camera" @click="openGallery">Galeri</f7-actions-button>
+                <f7-actions-button v-else @click="openGalleryWeb">Galeri</f7-actions-button>
                 <f7-actions-button @click="takePicture">Kamera</f7-actions-button>
                 <f7-actions-button bold color="red">Cancel</f7-actions-button>
               </f7-actions-group>
@@ -41,7 +42,7 @@
             <f7-col>
               <div>
                 <label>
-                  <input type="radio" name="test" value="Angkutan Umum">
+                  <input type="radio" name="kat" v-model="kat" value="Angkutan Umum">
                   <f7-icon material="directions_bus" size="30px"></f7-icon>
                 </label>
               </div>
@@ -50,7 +51,7 @@
             <f7-col>
               <div>
                 <label>
-                  <input type="radio" name="test" value="Lalu Lintas">
+                  <input type="radio" name="kat" v-model="kat" value="Lalu Lintas">
                   <f7-icon material="traffic" size="30px"></f7-icon>
                 </label>
               </div>
@@ -59,7 +60,7 @@
             <f7-col>
               <div>
                 <label>
-                  <input type="radio" name="test" value="Perparkiran">
+                  <input type="radio" name="kat" v-model="kat" value="Perparkiran">
                   <f7-icon material="local_parking" size="30px"></f7-icon>
                 </label>
               </div>
@@ -70,7 +71,7 @@
             <f7-col>
               <div>
                 <label>
-                  <input type="radio" name="test" value="Infrastruktur">
+                  <input type="radio" name="kat" v-model="kat" value="Infrastruktur">
                   <f7-icon material="language" size="30px"></f7-icon>
                 </label>
               </div>
@@ -79,7 +80,7 @@
             <f7-col>
               <div>
                 <label>
-                  <input type="radio" name="test" value="Pengendalian Operasi">
+                  <input type="radio" name="kat" v-model="kat" value="Pengendalian Operasi">
                   <f7-icon material="directions_walk" size="30px"></f7-icon>
                 </label>
               </div>
@@ -88,7 +89,7 @@
             <f7-col>
               <div>
                 <label>
-                  <input type="radio" name="test" value="Layanan">
+                  <input type="radio" name="kat" v-model="kat" value="Layanan">
                   <f7-icon material="people" size="30px"></f7-icon>
                 </label>
               </div>
@@ -101,7 +102,11 @@
       <f7-block>
         <l-map style="height: 200px;" id="map" ref="myMap" :zoom="zoom" :center="center">
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-          <l-marker :lat-lng="marker" @click="removeMarker()">
+          <l-marker id="marker"
+          v-bind:class="{preview: showPreview}"
+          v-show="address" 
+          :lat-lng="marker" 
+          @click="removeMarker()">
             <l-popup>{{address}}</l-popup>
           </l-marker>
         </l-map>
@@ -114,7 +119,7 @@
             <li class="item-content item-input">
               <div class="item-inner">
                 <div class="item-input-wrap">
-                  <textarea placeholder="Deskripsi Laporan"></textarea>
+                  <textarea v-model="desk" placeholder="Deskripsi Laporan"></textarea>
                 </div>
               </div>
             </li>
@@ -125,6 +130,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import {LMap, LTileLayer, LMarker, LPopup } from 'vue2-leaflet';
 import * as geocoding from 'esri-leaflet-geocoder';
 import * as EXIF from 'exif-js';
@@ -150,7 +156,7 @@ var geocodeService = geocoding.geocodeService();
         center: L.latLng(-7.484621, 112.434517),
         url:'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
         attribution:'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-        marker: L.latLng(-7.470475, 112.440132), 
+        marker: L.latLng(0, 0), 
         address: null,
 
         //upload
@@ -159,20 +165,41 @@ var geocodeService = geocoding.geocodeService();
         showPreview: false,
         imagePreview: '',
 
+        //axios
+        kat: '',
+        desk: '',
+        lat: null,
+        lng: null,
+
         //exif
         metadata: null,
+
+        //camera
+        camera: navigator.camera
       }
     },
 
     methods: {
-      ready(){
-        console.log('asu');
+      default(){
+        console.log('defaultCallback');
         
       },
-      //get photo from gallery
-      galeri(){
+      openGalleryWeb(){
         document.getElementById('file-input').click();
         this.$refs.actionsOneGroup.close();
+      },
+      //get photo from gallery
+      openGallery(){
+        if (navigator.camera){
+             // Retrieve image file location from specified source
+            navigator.camera.getPicture(this.setPicture, this.error, { 
+              quality: 80,
+              destinationType: Camera.DestinationType.FILE_URI,
+              sourceType: navigator.camera.PictureSourceType.SAVEDPHOTOALBUM 
+              });
+           }else{
+             this.error;
+           }
       },
       // Use the camera plugin to capture image
       takePicture() {
@@ -196,16 +223,17 @@ var geocodeService = geocoding.geocodeService();
       // this action will automatically update the view.
       setPicture(imagePath){
         let self = this;
+        this.$f7.dialog.preloader();
         this.imagePreview = imagePath;
-        this.showPreview = true;
+        this.showPreview = false;
 
         window.resolveLocalFileSystemURL(imagePath, 
           function(fileEntry){
               //alert("got image file entry: " + fileEntry.fullPath);
-              self.filename = fileEntry.fullPath.replace("/", "");
+              //self.filename = fileEntry.fullPath.replace("/", "");
               fileEntry.file(function(file){ //should return a raw HTML File Object
                 console.log('dari kamera: ', file);
-                self.getEXIF(file);
+                self.getLocation(file);
               }, 
               self.error); 
           },
@@ -213,7 +241,13 @@ var geocodeService = geocoding.geocodeService();
         );          
       },
       error(err){
-        alert((err));
+        if(navigator.notification){
+            navigator.notification.alert(err, this.default, "Error!");
+            this.$f7.dialog.close();
+          }else{
+              alert(err);
+              this.$f7.dialog.close();
+            }
       },
       /*Submits the file to the server*/
       submitFile(){
@@ -221,34 +255,45 @@ var geocodeService = geocoding.geocodeService();
             let formData = new FormData();
 
             /*Add the form data we need to submit*/
-            formData.append('file', this.file);
+            formData.append('userid', 1);
+            formData.append('kat', this.kat);
+            formData.append('fotoLapor', this.file);
+            formData.append('desk', this.desk);
+            formData.append('lat', this.lat);
+            formData.append('long', this.lng);
+            formData.append('lokasi', this.address);
+            formData.append('vote', "");
+
+            // Display the key/value pairs
+            for (var pair of formData.entries()) {
+                console.log(pair[0]+ ': ' + pair[1]); 
+            }
+            
 
         /*Make the request to the POST /single-file URL*/
-            axios.post( '/file-preview',
+            axios.post('http://localhost:3000/lapor/',
                 formData,
                 {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
               }
-            ).then(function(){
-          console.log('SUCCESS!!');
+            ).then(function(response){
+          console.log('SUCCESS!!', response);
           alert("sukses");
         })
-        .catch(function(){
-          console.log('FAILURE!!');
+        .catch(function(error){
+          console.log('FAILURE!!', error.message);
           alert("gagal");
         });
       },
 
       /*Handles a change on the file upload*/
       handleFileUpload(){
+        this.$refs.actionsOneGroup.close();
         let self = this;
         /*Set the local file variable to what the user has selected.*/
         this.file = this.$refs.file.files[0];
-        
-        
-        
 
         /*Initialize a File Reader object*/
         var reader  = new FileReader();
@@ -278,47 +323,44 @@ var geocodeService = geocoding.geocodeService();
             reader.readAsDataURL( this.file );
           }
         }
-        this.getEXIF(this.file);  
+        this.getLocation(this.file);  
       },
-      getEXIF(file){
+      getLocation(file){
         let self = this;
         EXIF.getData(file, function() {
-                console.log('image info', this)
-                console.log('exif data', this.exifdata)
-                self.metadata = this.exifdata;
-                // Calculate latitude decimal
-                var latDegree = this.exifdata.GPSLatitude[0];
-                var latMinute = this.exifdata.GPSLatitude[1];
-                var latSecond = this.exifdata.GPSLatitude[2];
-                var latDirection = this.exifdata.GPSLatitudeRef;
-                
-                var latFinal = self.ConvertDMSToDD(latDegree, latMinute, latSecond, latDirection);
-                console.log(latFinal);
+          self.metadata = this.exifdata;
 
-                // Calculate longitude decimal
-                var lonDegree = this.exifdata.GPSLongitude[0];
-                var lonMinute = this.exifdata.GPSLongitude[1];
-                var lonSecond = this.exifdata.GPSLongitude[2];
-                var lonDirection = this.exifdata.GPSLongitudeRef;
+          axios.post('http://localhost:3000/lapor/lokasi', this.exifdata)
+          .then(function (response) {
+            console.log(response.data);
 
-                var lonFinal = self.ConvertDMSToDD(lonDegree, lonMinute, lonSecond, lonDirection);
-                console.log(lonFinal);
+            self.lat = response.data.values[0].originLat;
+            self.lng = response.data.values[0].originLng;
 
-                self.marker = L.latLng(latFinal, lonFinal);
-                self.center = L.latLng(latFinal, lonFinal);
-                var tes = self.reverseGeocode(self.marker);
-                console.log(tes);
+            self.marker = L.latLng(self.lat, self.lng);
+            self.center = L.latLng(self.lat, self.lng);
+            self.address = response.data.values[0].data.formattedAddress;
 
-                  });
-      },
-      ConvertDMSToDD(degrees, minutes, seconds, direction){
-        var dd = degrees + (minutes/60) + (seconds/3600);
-            
-          if (direction == "S" || direction == "W") {
-              dd = dd * -1; 
-          }
-            
-        return dd;
+            self.$f7.dialog.close();
+          })
+          .catch(function (error) {
+            console.log(error.message);
+
+            if(navigator.notification){
+                navigator.notification.alert("Tidak ditemukan lokasi pada foto!", self.default, "Error!");
+                self.showPreview = true;
+                self.marker = L.latLng(0, 0);
+                self.address = null;
+                self.$f7.dialog.close();
+              }else{
+                alert("No GPS Location Data Found");
+                self.showPreview = true;
+                self.marker = L.latLng(0, 0);
+                self.address = null;
+                self.$f7.dialog.close();
+              }
+          });
+        });
       },
       removeMarker() {
       //this.markers.splice(index, 1);
@@ -328,22 +370,9 @@ var geocodeService = geocoding.geocodeService();
           this.marker = result.latlng;
           this.address = result.address.Match_addr;
           console.log(response);
-      })
-      },
-      reverseGeocode(marker){
-        geocodeService.reverse().latlng(marker).run((error, result, response) => {
-          this.marker = result.latlng;
-          var tes2 = this.address = result.address.Match_addr;
-          console.log(response);
-          return tes2;
-      })
+        });
       }
     }
-    // mounted () {
-    //   this.$nextTick(() => {
-    //     this.$refs.myMap.mapObject.ANY_LEAFLET_MAP_METHOD();
-    //   })
-    // }
   }
 </script>
 <style scoped>

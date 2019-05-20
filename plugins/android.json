@@ -18,6 +18,9 @@
     },
     "cordova-plugin-file-transfer": {
       "PACKAGE_NAME": "com.skripsi.nrk"
+    },
+    "cordova-plugin-dialogs": {
+      "PACKAGE_NAME": "com.skripsi.nrk"
     }
   },
   "dependent_plugins": {}

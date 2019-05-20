@@ -19,6 +19,7 @@ import PinjamJalan from './pages/pinjam-jalan.vue';
 import KritikSaran from './pages/kritik-saran.vue';
 import Leaflet from './pages/leaflet.vue';
 import Survey from './pages/survey.vue';
+import AxiosTest from './pages/axios-test.vue';
 
 import PanelLeftPage from './pages/panel-left.vue';
 import PanelRightPage from './pages/panel-right.vue';
@@ -114,6 +115,10 @@ export default [
   {
     path: '/survey/',
     component: Survey,
+  },
+  {
+    path: '/axios-test/',
+    component: AxiosTest,
   },
   {
     path: '/leaflet/',
