@@ -16,7 +16,8 @@
     </f7-panel>
 
     <!-- Main View -->
-    <f7-view id="main-view" url="/home/" main class="safe-areas"></f7-view>
+    <f7-view id="main-view" url="/home/" main class="safe-areas" v-if="headers.authorization != undefined"></f7-view>
+    <f7-view id="main-view" url="/login/" main class="safe-areas" v-else></f7-view>
 
     <!-- Popup -->
     <f7-popup id="popup">
@@ -65,12 +66,17 @@
 </template>
 
 <script>
+console.log('token:', localStorage.getItem('token'));
+
 // Import Routes
-import routes from './routes.js'
+import routes from './routes.js';
 
 export default {
   data() {
     return {
+      headers: {
+        authorization: localStorage.getItem('token')
+      },
       // Framework7 parameters here
       f7params: {
         id: 'io.framework7.testapp', // App bundle ID
@@ -80,6 +86,20 @@ export default {
         routes: routes,
       },
     }
+  },
+  created() {
+    // Return true / false - check if a JWT token is stored in cookies or local storage
+    let hastoken = this.$jwt.hasToken(localStorage.getItem('token'));
+    console.log('has', hastoken);
+    
+    // Return token from cookies or local storage
+    let token = this.$jwt.getToken(localStorage.getItem('token'));
+    console.log('get', token);
+    
+    // Decode JWT token and return payload
+    let decode = this.$jwt.decode(localStorage.getItem('token'));
+    console.log('decode', decode);
+    
   }
 }
 </script>

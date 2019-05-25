@@ -1,9 +1,6 @@
 <template>
   <f7-page :page-content="false">
     <f7-toolbar tabbar labels bottom>
-      <!-- <f7-link tab-link href="./" route-tab-id="tab1" text="Beranda" icon-ios="f7:home" icon-md="material:home"></f7-link>
-      <f7-link tab-link href="tab2/" route-tab-id="tab2" text="Profil" icon-ios="f7:person" icon-md="material:person"></f7-link>
-      <f7-link tab-link href="tab3/" route-tab-id="tab3" icon-ios="f7:info" icon-md="material:info"></f7-link> -->
       <f7-link tab-link route-tab-id="tab1" href="./" text="Beranda" icon-ios="f7:home" icon-md="material:home"></f7-link>
       <f7-link tab-link route-tab-id="tab2" href="tab2/" text="Info" icon-ios="f7:info" icon-md="material:info"></f7-link>
       <f7-link tab-link href="/report/" text="Lapor" icon-ios="f7:add" icon-md="material:add_box"></f7-link>
@@ -26,5 +23,10 @@
 </template>
 <script>
   export default {
+    data() {
+      return {
+
+      }
+    }
   };
 </script>

@@ -3,11 +3,11 @@
     <f7-login-screen-title>Framework7</f7-login-screen-title>
     <f7-list form>
       <f7-list-input
-        label="Username"
-        type="text"
-        placeholder="Your username"
-        :value="username"
-        @input="username = $event.target.value"
+        label="Email"
+        type="email"
+        placeholder="Your email"
+        :value="email"
+        @input="email = $event.target.value"
       ></f7-list-input>
       <f7-list-input
         label="Password"
@@ -25,21 +25,35 @@
 </template>
 
 <script>
+import axios from '../config/axiosConfig';
+
   export default {
     data() {
       return {
-        username: '',
+        email: '',
         password: '',
       };
     },
     methods: {
-      signIn() {
-        const self = this;
-        const app = self.$f7;
-        const router = self.$f7router;
-        app.dialog.alert(`Username: ${self.username}<br>Password: ${self.password}`, () => {
-          router.back();
-        });
+      async signIn() {
+        try {
+          const self = this;
+          const app = self.$f7;
+          const router = self.$f7router;
+
+          let user = await axios().post('/user/login', {
+            email: this.email,
+            pass: this.password
+          });
+
+          localStorage.setItem('token', user.data.token);
+          router.navigate('/home/');
+          
+        } catch (error) {
+          console.log(error.message);
+          this.$f7.dialog.alert('Kombinasi email dan password salah!', 'Terjadi Kesalahan');  
+        }
+        
       },
     },
   };

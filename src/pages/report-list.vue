@@ -1,42 +1,80 @@
 <template>
-  <f7-page>
+  <f7-page ptr @ptr:refresh="pullToRefresh">
     <f7-navbar title="Laporan Keluhan" back-link="Back"></f7-navbar>
-    <f7-block-title>Styled Cards</f7-block-title>
-<f7-card class="demo-card-header-pic">
+<f7-card class="demo-card-header-pic" v-for="(item, index) in items" :key="index">
+  <a :href="'/report-detail/' + item.id_lapor">
   <f7-card-header
+    :id-lapor="item.id_lapor"
     class="no-border"
     valign="bottom"
-    style="background-image:url(https://cdn.framework7.io/placeholder/nature-1000x600-3.jpg)"
-  >Journey To Mountains</f7-card-header>
+    :style="{ backgroundImage: 'url(' + item.foto_lapor + ')' }"
+  ><span><f7-icon md="material:place"></f7-icon>{{item.lokasi_lapor}}</span></f7-card-header></a>
+  <!-- background-image:url -->
   <f7-card-content>
-    <p class="date">Posted on January 21, 2015</p>
-    <p>Quisque eget vestibulum nulla. Quisque quis dui quis ex ultricies efficitur vitae non felis. Phasellus quis nibh hendrerit...</p>
+    <p class="date">{{formatTgl(item.tgl_lapor)}}</p>
+    <p>{{item.desk_lapor}}</p>
   </f7-card-content>
   <f7-card-footer>
-    <span>Status:</span>
+    <f7-chip v-if="item.status_lapor == 'Menunggu'" :text="item.status_lapor" color="yellow"></f7-chip>
+    <f7-chip v-else-if="item.status_lapor == 'Proses'" :text="item.status_lapor" color="blue"></f7-chip>
+    <f7-chip v-else-if="item.status_lapor == 'Selesai'" :text="item.status_lapor" color="green"></f7-chip>
+    <f7-chip v-else :text="item.status_lapor" color="red"></f7-chip>
     <f7-link>Read more</f7-link>
-  </f7-card-footer>
-</f7-card>
-<f7-card class="demo-card-header-pic">
-  <f7-card-header
-    class="no-border"
-    valign="bottom"
-    style="background-image:url(https://cdn.framework7.io/placeholder/people-1000x600-6.jpg)"
-  >Journey To Mountains</f7-card-header>
-  <f7-card-content>
-    <p class="date">Posted on January 21, 2015</p>
-    <p>Quisque eget vestibulum nulla. Quisque quis dui quis ex ultricies efficitur vitae non felis. Phasellus quis nibh hendrerit...</p>
-  </f7-card-content>
-  <f7-card-footer>
-    <span>Status:</span>
-    <f7-link href="/report-detail/">Read more</f7-link>
   </f7-card-footer>
 </f7-card>
   </f7-page>
 </template>
 
 <script>
-export default {}
+import axios from '../config/axiosConfig';
+
+export default {
+  data() {
+    return {
+      items: []
+    }
+  },
+  async created() {
+    this.$f7.preloader.show();
+    let result = await axios().get('/lapor/laporku');
+    this.$f7.preloader.hide();
+    console.log(result.data.values);
+
+    this.items = result.data.values;
+  },
+  methods: {
+    formatTgl(tgl) {
+      let arrHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      let arrBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+      let date = new Date(tgl);
+      let tanggal = date.getDate();
+      let hari = date.getDay();
+      let bulan = date.getMonth();
+      let tahun = date.getFullYear();
+
+      arrHari = arrHari[hari];
+      arrBulan = arrBulan[bulan];
+
+      //let tahun = (year < 1000) ? year + 1900 : year;
+
+      let hasil = arrHari + ', ' + tanggal + ' ' + arrBulan + ' ' + tahun;
+      
+      return hasil;
+    },
+    async pullToRefresh(event, done) {
+        let self = this;
+
+        setTimeout(async () => {
+          let result = await axios().get('/lapor/laporku');
+          self.items = result.data.values;
+          
+          done();
+        }, 1000);
+      }
+  }
+}
 </script>
 <style scoped>
 .demo-card-header-pic .card-header {

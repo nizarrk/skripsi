@@ -36,7 +36,7 @@
         </center>
       </f7-block>
       <f7-block-title>Kategori</f7-block-title>
-      <f7-block>
+      <f7-block style="font-size:12px;">
         <center>
           <f7-row>
             <f7-col>
@@ -46,7 +46,7 @@
                   <f7-icon material="directions_bus" size="30px"></f7-icon>
                 </label>
               </div>
-              <span style="font-size:11px;">Angkutan Umum</span>
+              <span>Angkutan Umum</span>
             </f7-col>
             <f7-col>
               <div>
@@ -55,7 +55,7 @@
                   <f7-icon material="traffic" size="30px"></f7-icon>
                 </label>
               </div>
-              <span style="font-size:11px;">Lalu Lintas</span>
+              <span>Lalu Lintas</span>
             </f7-col>
             <f7-col>
               <div>
@@ -64,10 +64,10 @@
                   <f7-icon material="local_parking" size="30px"></f7-icon>
                 </label>
               </div>
-              <span style="font-size:11px;">Perparkiran</span>
+              <span>Perparkiran</span>
             </f7-col>
           </f7-row>
-          <f7-row style="margin-top:10px;">
+          <f7-row style="margin-top:25px;">
             <f7-col>
               <div>
                 <label>
@@ -75,7 +75,7 @@
                   <f7-icon material="language" size="30px"></f7-icon>
                 </label>
               </div>
-              <span style="font-size:11px;">Infrastruktur</span>
+              <span>Infrastruktur</span>
             </f7-col>
             <f7-col>
               <div>
@@ -84,7 +84,7 @@
                   <f7-icon material="directions_walk" size="30px"></f7-icon>
                 </label>
               </div>
-              <span style="font-size:11px;">Pengendalian Operasi</span>
+              <span>Pengendalian Operasi</span>
             </f7-col>
             <f7-col>
               <div>
@@ -93,7 +93,7 @@
                   <f7-icon material="people" size="30px"></f7-icon>
                 </label>
               </div>
-              <span style="font-size:11px;">Layanan</span>
+              <span>Layanan</span>
             </f7-col>
           </f7-row>
         </center>
@@ -103,14 +103,14 @@
         <l-map style="height: 200px;" id="map" ref="myMap" :zoom="zoom" :center="center">
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
           <l-marker id="marker"
-          v-bind:class="{preview: showPreview}"
+          :class="{preview: showPreview}"
           v-show="address" 
           :lat-lng="marker" 
           @click="removeMarker()">
             <l-popup>{{address}}</l-popup>
           </l-marker>
         </l-map>
-        <f7-icon v-show="address != null" md="material:place"></f7-icon><span style="font-size:11px;">{{address}}</span>
+        <span style="color: #8e8e93"><f7-icon v-show="address != null" md="material:place"></f7-icon><span style="font-size:12px;">{{address}}</span></span>
       </f7-block>
       <f7-block-title>Deskripsi</f7-block-title>
       <f7-block>
@@ -130,11 +130,13 @@
 </template>
 
 <script>
-import axios from 'axios';
+
 import {LMap, LTileLayer, LMarker, LPopup } from 'vue2-leaflet';
 import * as geocoding from 'esri-leaflet-geocoder';
 import * as EXIF from 'exif-js';
 import VueJsonPretty from 'vue-json-pretty'
+import { log } from 'util';
+import axios from '../config/axiosConfig';
 
 var geocodeService = geocoding.geocodeService();
 
@@ -223,7 +225,7 @@ var geocodeService = geocoding.geocodeService();
       // this action will automatically update the view.
       setPicture(imagePath){
         let self = this;
-        this.$f7.dialog.preloader();
+        this.$f7.preloader.show();
         this.imagePreview = imagePath;
         this.showPreview = false;
 
@@ -245,24 +247,24 @@ var geocodeService = geocoding.geocodeService();
             navigator.notification.alert(err, this.default, "Error!");
             this.$f7.dialog.close();
           }else{
-              alert(err);
+              self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
               this.$f7.dialog.close();
             }
       },
       /*Submits the file to the server*/
       submitFile(){
+        let self = this;
         /*Initialize the form data*/
             let formData = new FormData();
 
             /*Add the form data we need to submit*/
-            formData.append('userid', 1);
             formData.append('kat', this.kat);
             formData.append('fotoLapor', this.file);
             formData.append('desk', this.desk);
             formData.append('lat', this.lat);
             formData.append('long', this.lng);
             formData.append('lokasi', this.address);
-            formData.append('vote', "");
+            formData.append('vote', 0);
 
             // Display the key/value pairs
             for (var pair of formData.entries()) {
@@ -270,22 +272,18 @@ var geocodeService = geocoding.geocodeService();
             }
             
 
-        /*Make the request to the POST /single-file URL*/
-            axios.post('http://localhost:3000/lapor/',
-                formData,
-                {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-              }
-            ).then(function(response){
-          console.log('SUCCESS!!', response);
-          alert("sukses");
-        })
-        .catch(function(error){
-          console.log('FAILURE!!', error.message);
-          alert("gagal");
-        });
+            /*Make the request to the POST /single-file URL*/
+            axios().post('/lapor/', formData)
+            .then(function(response){
+              console.log('SUCCESS!!', response);
+              self.$f7.dialog.alert(response.statusText, 'Berhasil'); 
+              self.$f7router.navigate('/report-list/');
+              })
+              .catch(function(error){
+                console.log('FAILURE!!', error.message);
+                self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');  
+                //self.$f7router.navigate('/home/');
+                });
       },
 
       /*Handles a change on the file upload*/
@@ -330,7 +328,7 @@ var geocodeService = geocoding.geocodeService();
         EXIF.getData(file, function() {
           self.metadata = this.exifdata;
 
-          axios.post('http://localhost:3000/lapor/lokasi', this.exifdata)
+          axios().post('/lapor/lokasi', this.exifdata)
           .then(function (response) {
             console.log(response.data);
 
@@ -341,7 +339,7 @@ var geocodeService = geocoding.geocodeService();
             self.center = L.latLng(self.lat, self.lng);
             self.address = response.data.values[0].data.formattedAddress;
 
-            self.$f7.dialog.close();
+            self.$f7.preloader.hide();
           })
           .catch(function (error) {
             console.log(error.message);
@@ -353,7 +351,7 @@ var geocodeService = geocoding.geocodeService();
                 self.address = null;
                 self.$f7.dialog.close();
               }else{
-                alert("No GPS Location Data Found");
+                self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');  
                 self.showPreview = true;
                 self.marker = L.latLng(0, 0);
                 self.address = null;

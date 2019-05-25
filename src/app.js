@@ -16,9 +16,23 @@ import AppStyles from './css/app.css';
 
 // Import App Component
 import App from './app.vue';
-import Tabbar from './pages/tabbar.vue'
+
+// Import Leaflet
 import { Icon }  from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+
+// Import vue-jwt
+import VueJWT from 'vuejs-jwt'
+const options = {
+  keyName: 'token' 
+};
+Vue.use(VueJWT, options);
+
+// Axios Config
+// import axios from 'axios';
+// Vue.prototype.axios = axios;
+// axios.defaults.baseURL = 'http://192.168.1.12:3000';
+// axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
 
 
 // this part resolve an issue where the markers would not appear
@@ -30,7 +44,6 @@ Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
 
-Vue.component('tabbar', Tabbar);
 
 
 // Init F7 Vue Plugin

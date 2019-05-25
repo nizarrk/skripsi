@@ -1,4 +1,5 @@
 import HomePage from './pages/home.vue';
+import Login from './pages/login.vue';
 import AboutPage from './pages/about.vue';
 import FormPage from './pages/form.vue';
 import DynamicRoutePage from './pages/dynamic-route.vue';
@@ -25,7 +26,7 @@ import PanelLeftPage from './pages/panel-left.vue';
 import PanelRightPage from './pages/panel-right.vue';
 
 export default [
-  {
+    {
     path: '/home/',
     component: TabRoute,
     tabs: [
@@ -55,6 +56,10 @@ export default [
         component: Profile,
       },
 ],
+  },
+  {
+    path: '/login/',
+    component: Login,
   },
   {
     path: '/panel-left/',
@@ -97,11 +102,11 @@ export default [
     component: ReportList,
   },
   {
-    path: '/report-detail/',
+    path: '/report-detail/:id',
     component: ReportDetail,
   },
   {
-    path: '/comments/',
+    path: '/comments/:id',
     component: Comments,
   },
   {
