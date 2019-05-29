@@ -1,22 +1,25 @@
 import HomePage from './pages/home.vue';
 import Login from './pages/login.vue';
+import Register from './pages/register.vue';
 import AboutPage from './pages/about.vue';
 import FormPage from './pages/form.vue';
 import DynamicRoutePage from './pages/dynamic-route.vue';
 import NotFoundPage from './pages/not-found.vue';
 import Profile from './pages/profile.vue';
+import EditProfile from './pages/profile-edit.vue';
 import TabRoute from './pages/tabs-routable.vue';
 import TabSwipe from './pages/tabs-swipeable.vue';
 import Info from './pages/info.vue';
 import Themes from './pages/color-theme.vue';
 import Settings from './pages/settings.vue';
-import EditProfile from './pages/edit-profile.vue';
 import Notifications from './pages/notifications.vue';
 import Report from './pages/report.vue';
 import ReportList from './pages/report-list.vue';
 import ReportDetail from './pages/report-detail.vue';
+import ReportEdit from './pages/report-edit.vue';
 import Comments from './pages/comments.vue';
-import PinjamJalan from './pages/pinjam-jalan.vue';
+import IzinList from './pages/izin-list.vue';
+import IzinAdd from './pages/izin-add.vue';
 import KritikSaran from './pages/kritik-saran.vue';
 import Leaflet from './pages/leaflet.vue';
 import Survey from './pages/survey.vue';
@@ -62,6 +65,10 @@ export default [
     component: Login,
   },
   {
+    path: '/register/',
+    component: Register,
+  },
+  {
     path: '/panel-left/',
     component: PanelLeftPage,
   },
@@ -90,7 +97,7 @@ export default [
     component: Settings,
   },
   {
-    path: '/edit-profile/',
+    path: '/profile-edit/:id',
     component: EditProfile,
   },
   {
@@ -106,12 +113,20 @@ export default [
     component: ReportDetail,
   },
   {
+    path: '/report-edit/:id',
+    component: ReportEdit,
+  },
+  {
     path: '/comments/:id',
     component: Comments,
   },
   {
-    path: '/pinjam-jalan/',
-    component: PinjamJalan,
+    path: '/izin-list/',
+    component: IzinList,
+  },
+  {
+    path: '/izin-add/',
+    component: IzinAdd,
   },
   {
     path: '/kritik-saran/',

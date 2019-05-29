@@ -18,7 +18,7 @@
     <f7-card class="demo-facebook-card" v-for="(item, index) in items" :key="index">
       <f7-card-header class="no-border" :laporid="item.id_lapor">
         <div class="demo-facebook-avatar">
-          <img :src="item.foto_user" style="width: 34px; border-radius: 20px;"/>
+          <img :src="baseURL + item.foto_user" style="width: 34px; border-radius: 20px;"/>
         </div>
         <div class="demo-facebook-name">{{item.nama_user}}</div>
         <div class="demo-facebook-date">{{timeDifference(item.tgl_lapor)}}</div>
@@ -26,7 +26,7 @@
       <f7-card-content>
         <p>{{item.desk_lapor}}</p>
         <a :href="'/report-detail/' + item.id_lapor">
-        <img :src="item.foto_lapor" width="100%"/>
+        <img :src="baseURL + item.foto_lapor" width="100%"/>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Angkutan Umum'"><f7-icon material="directions_bus" size="15px"></f7-icon><span> Angkutan Umum</span></span>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Lalu Lintas'"><f7-icon material="traffic" size="15px"></f7-icon><span> Lalu Lintas</span></span>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Perparkiran'"><f7-icon material="local_parking" size="15px"></f7-icon><span> Perparkiran</span></span>
@@ -47,22 +47,28 @@
 </template>
 <script>
 import { setTimeout } from 'timers';
-import timeDiff from '../mixins/timeDiff';
+import date from '../mixins/dateConfig';
 import axios from '../config/axiosConfig';
 
 export default {
     data() {
       return {
+        baseURL: 'http://192.168.1.12:3000',
         items: []
       };
     },
     async created() {
-      this.$f7.preloader.show();
-      let result = await axios().get('/lapor');
-      this.$f7.preloader.hide();
-      console.log(result.data.values.length);
+      try {
+        this.$f7.preloader.show();
+        let result = await axios().get('/lapor');
+        this.$f7.preloader.hide();
+        console.log(result.data.values.length);
 
-      this.items = result.data.values;
+        this.items = result.data.values;
+      } catch (error) {
+        console.log(error);
+        
+      }
     },
     methods: {
       async pullToRefresh(event, done) {
@@ -76,7 +82,7 @@ export default {
         }, 1000);
       }
     },
-    mixins: [timeDiff]
+    mixins: [date]
   }
 </script>
 <style scoped>

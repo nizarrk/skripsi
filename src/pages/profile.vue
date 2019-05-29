@@ -8,16 +8,16 @@
         <f7-block strong>
               <f7-row>
                 <f7-col width="25">
-                  <img :src="items.foto_user" 
-                  style="border-radius:50px; weight:70px; height:70px;"/>
+                  <img :src="baseURL + items.foto_user" 
+                  style="border-radius:50px; max-width: 70px;"/>
                 </f7-col>
                 <f7-col width="50">
                   <span style="font-size:18px;"><b>{{items.nama_user}}</b></span><br>
-                <span><f7-icon md="material:place"></f7-icon>{{items.alamat_user}}</span>
+                <span style="color: #8e8e93; font-size:13px;"><f7-icon md="material:place" size="20px"></f7-icon>{{items.alamat_user}}</span>
                   <!-- <f7-button raised style="text-transform: capitalize;">Sunting</f7-button> -->
                 </f7-col>
-                <f7-col width="25" style="padding-top:15px; padding-left:25px;">
-                  <f7-link icon-ios="f7:bell" icon-md="material:edit" href="/edit-profile/" />
+                <f7-col width="25" style="padding-top:15px; padding-left:50px;">
+                  <f7-link icon-ios="f7:bell" icon-md="material:edit" :href="'/profile-edit/' + items.id_user" />
                 </f7-col>
               </f7-row>
         </f7-block>
@@ -42,7 +42,7 @@
             <f7-list-item link="/report-list/" title="Laporan Keluhan" :badge="items.total_lapor">
               <f7-icon slot="media" md="material:report"></f7-icon>
             </f7-list-item>
-            <f7-list-item link="/pinjam-jalan/" title="Peminjaman Jalan">
+            <f7-list-item link="/izin-list/" title="Izin Penggunaan Jalan" :badge="items.total_izin">
               <f7-icon slot="media" md="material:note_add"></f7-icon>
             </f7-list-item>
             <f7-list-item link="/survey/" title="Survey Kepuasan Masyarakat">
@@ -62,17 +62,18 @@ import axios from '../config/axiosConfig';
 export default {
     data() {
       return {
+        baseURL: 'http://192.168.1.12:3000',
         items: []
       };
     },
     async created() {
-      this.$f7.dialog.preloader();
+      this.$f7.preloader.show();
       let result = await axios().get('/user/profile');
-      this.$f7.dialog.close();
+      this.$f7.preloader.hide();
       //console.log(result.data.values);
 
       this.items = result.data.values[0];
-      console.log(this.items);
+      console.log(result.data);
       
     },
     methods: {

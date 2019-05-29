@@ -1,18 +1,23 @@
 <template>
   <f7-page>
-    <f7-navbar title="Laporan Keluhan" back-link="Back">
+    <f7-navbar title="Laporan Keluhan" back-link="Back" v-if="items.id_user_lapor == this.decoded">
       <f7-nav-right>
-            <f7-link icon-ios="f7:gear" icon-md="material:edit" href="/report-edit/"></f7-link>
+            <f7-link icon-ios="f7:gear" icon-md="material:edit" :href="'/report-edit/' + items.id_lapor"></f7-link>
           </f7-nav-right>
     </f7-navbar>
+    <f7-navbar title="Laporan Keluhan" back-link="Back" v-else></f7-navbar>
         <f7-card class="demo-facebook-card">
             <f7-card-header class="no-border">
-                <div class="demo-facebook-avatar"><img :src="items.foto_user" style="width: 34px; border-radius: 20px;"/></div>
+                <div class="demo-facebook-avatar"><img :src="baseURL + items.foto_user" style="width: 34px; border-radius: 20px;"/></div>
                 <div class="demo-facebook-name">{{items.nama_user}}</div>
                 <div class="demo-facebook-date">{{formatTgl(items.tgl_lapor)}}</div>
             </f7-card-header>
             <f7-card-content>
-                <p>{{items.desk_lapor}}</p><img :src="items.foto_lapor" width="100%"/>
+              <f7-photo-browser v-if="photo"
+                :photos="[photo]"
+                ref="standalone"
+              ></f7-photo-browser>
+                <p>{{items.desk_lapor}}</p><img ref="fotolapor" :src="baseURL + items.foto_lapor" width="100%" raised @click="$refs.standalone.open()"/>
                 <span style="color: #8e8e93" v-show="items.kat_lapor == 'Angkutan Umum'"><f7-icon material="directions_bus" size="15px"></f7-icon><span>Angkutan Umum</span></span>
                 <span style="color: #8e8e93" v-show="items.kat_lapor == 'Lalu Lintas'"><f7-icon material="traffic" size="15px"></f7-icon><span>Lalu Lintas</span></span>
                 <span style="color: #8e8e93" v-show="items.kat_lapor == 'Perparkiran'"><f7-icon material="local_parking" size="15px"></f7-icon><span>Perparkiran</span></span>
@@ -46,7 +51,7 @@
             <f7-list-item v-show="items.id_komentar != null"
               :title="items.nama_komentator"
               :after="timeDifference(items.tgl_komentar)">
-              <img slot="media" :src="items.foto_komentator" width="44px" />
+              <img slot="media" :src="baseURL + items.foto_komentator" width="44px" />
               <span style="font-size: 13px; color: #8e8e93;">{{items.desk_komentar}}</span>
             </f7-list-item>
             <f7-list-item v-show="items.id_komentar == null">
@@ -60,8 +65,9 @@
 
 <script>
 import {LMap, LTileLayer, LMarker, LPopup } from 'vue2-leaflet';
-import timeDiff from '../mixins/timeDiff';
+import date from '../mixins/dateConfig';
 import axios from '../config/axiosConfig';
+import { error } from 'util';
 
 export default {
   props: {
@@ -75,7 +81,10 @@ export default {
   },
   data() {
     return {
+      baseURL: 'http://192.168.1.12:3000',
+      decoded: null,
       items: [],
+      photo: '',
 
       //leaflet
       zoom:13,
@@ -87,6 +96,8 @@ export default {
     }
   },
   async created() {
+    let decode = this.$jwt.decode(localStorage.getItem('token'));
+    this.decoded = decode.userId;
     this.$f7.preloader.show();
     let result = await axios().get('/lapor/' + this.id);
     this.$f7.preloader.hide();
@@ -96,30 +107,29 @@ export default {
     this.center = L.latLng(result.data.values[0].lat_lapor, result.data.values[0].long_lapor);
     this.items = result.data.values[0];
 
+    let url = this.baseURL + result.data.values[0].foto_lapor;
+    console.log('ref', this.$refs.fotolapor.src);
+    this.photo = url;
+    console.log('pb', this.photo);
+
   },
   methods: {
-    formatTgl(tgl) {
-      let arrHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-      let arrBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
-                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    pb() {
+      axios().get('/lapor/' + this.id).then(result => {
+        let url = this.baseURL + result.data.values[0].foto_lapor;
+        console.log('ref', this.$refs.fotolapor.src);
+        this.photo = url;
+        console.log('pb', this.photo);
 
-      let date = new Date(tgl);
-      let tanggal = date.getDate();
-      let hari = date.getDay();
-      let bulan = date.getMonth();
-      let tahun = date.getFullYear();
-
-      arrHari = arrHari[hari];
-      arrBulan = arrBulan[bulan];
-
-      //let tahun = (year < 1000) ? year + 1900 : year;
-
-      let hasil = arrHari + ', ' + tanggal + ' ' + arrBulan + ' ' + tahun;
-      
-      return hasil;
+        return this.photo;
+        
+      }).catch(error => {
+        console.log(error);
+        
+      })
     }
   },
-  mixins: [timeDiff]
+  mixins: [date]
 }
 </script>
 <style scoped>

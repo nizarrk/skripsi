@@ -20,7 +20,7 @@
     </f7-block>
     <f7-block>
         <f7-list>
-            <f7-list-item title="Keluar" link="#">
+            <f7-list-item title="Keluar" @click="logOut">
                 <f7-icon slot="media" md="material:exit_to_app"></f7-icon>
             </f7-list-item>
         </f7-list>
@@ -29,5 +29,17 @@
 </template>
 
 <script>
-export default {}
+export default {
+    data() {
+        return {
+
+        }
+    },
+    methods: {
+        logOut() {
+            localStorage.removeItem('token');
+            this.$f7router.navigate('/login/');
+        }
+    }
+}
 </script>

@@ -6,7 +6,7 @@
             <f7-list-item
               :title="item.nama_user"
               :after="timeDifference(item.tgl_komentar)">
-              <img slot="media" :src="item.foto_user" width="44" />
+              <img slot="media" :src="baseURL + item.foto_user" width="44" />
                 <span style="font-size: 13px; color: #8e8e93;">
                   {{item.desk_komentar}}
                 </span>
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import timeDiff from '../mixins/timeDiff';
+import date from '../mixins/dateConfig';
 import axios from '../config/axiosConfig';
 
 export default {
@@ -37,6 +37,7 @@ export default {
   },
   data() {
     return {
+      baseURL: 'http://192.168.1.12:3000',
       items: []
     }
   },
@@ -47,6 +48,6 @@ export default {
     console.log(result.data.values);
     this.items = result.data.values;
   },
-  mixins: [timeDiff]
+  mixins: [date]
 }
 </script>

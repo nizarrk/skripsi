@@ -1,6 +1,6 @@
 <template>
   <f7-page>
-    <f7-navbar title="Registrasi" back-link="Back">
+    <f7-navbar title="Edit Profil" back-link="Back">
         <f7-nav-right>
             <f7-link icon-ios="f7:save" icon-md="material:check" @click="formSubmit"></f7-link>
           </f7-nav-right>
@@ -15,7 +15,7 @@
             <f7-actions ref="actionsOneGroup">
               <f7-actions-group>
                 <f7-actions-label bold>Unggah Foto</f7-actions-label>
-                <f7-actions-button bold v-if="navigator.camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                <f7-actions-button bold v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
                 <f7-actions-button bold v-else @click="openGalleryWeb"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
                 <f7-actions-button bold @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
                 <f7-actions-button bold color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
@@ -82,10 +82,8 @@
                 label="Tanggal Lahir"
                 name="tgl"
                 type="date"
-                defaultValue="2014-04-30"
                 placeholder="-Pilih-"
                 :value="tgl"
-                @input="tgl = $event.target.value"
                 required
                 validate
             >
@@ -103,35 +101,6 @@
                 validate
                 clear-button
             ></f7-list-input>
-
-            <f7-list-input
-                label="Password"
-                name="pass"
-                type="password"
-                placeholder="Password"
-                error-message="Password harus diisi"
-                :value="pass"
-                @input="pass = $event.target.value"
-                minlength=8
-                info="Password minimal 8 karakter"
-                required
-                validate
-                clear-button
-            ></f7-list-input>
-            <f7-list-input
-                label="Konfirmasi Password"
-                name="confpass"
-                type="password"
-                placeholder="Konfirmasi Password"
-                :value="confpass"
-                @input="confpass = $event.target.value"
-                @change="checkPass"
-                :error-message-force = errorforce
-                :error-message="error"
-                required
-                validate
-                clear-button
-            ></f7-list-input>
         </f7-list>
     </f7-block>
   </f7-page>
@@ -142,29 +111,51 @@ import axios from '../config/axiosConfig';
 import defaultImg from '../static/defaultuser.jpg'
 
 export default {
+    props: {
+        id: String
+    },
     data() {
         return {
+            baseURL: 'http://192.168.1.12:3000',
             // uploads
             filename: '',
             file: null,
             showPreview: false,
-            imagePreview: defaultImg,
+            imagePreview: null,
 
             nama: null,
             alamat: null,
             telepon: null,
             jk: 'Laki-laki',
-            tgl: '2014-04-30',
+            tgl: null,
             email: null,
-            pass: null,
-            confpass: null,
-            error: 'Konfirmasi Password harus diisi',
-            errorforce: false,
+            oldemail: null,
+            path: null,
 
             //camera
             camera: navigator.camera
             
         }
+    },
+    async created() {
+        this.$f7.preloader.show();
+        let result = await axios().get('/user/profile');
+        this.$f7.preloader.hide();
+        //console.log(result.data.values);
+
+        this.nama = result.data.values[0].nama_user;
+        this.alamat = result.data.values[0].alamat_user;
+        this.telepon = result.data.values[0].telp_user;
+        let date = new Date(result.data.values[0].tgl_lahir_user);
+        let newdate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+        console.log(newdate);
+        
+        this.tgl = newdate;
+        this.email = result.data.values[0].email_user;
+        this.oldemail = result.data.values[0].email_user;
+        this.path = result.data.values[0].foto_user;
+        this.imagePreview = this.baseURL + result.data.values[0].foto_user;
+        console.log(this.imagePreview);
     },
     methods: {
         default(){
@@ -275,11 +266,7 @@ export default {
         async formSubmit() {
             if (document.getElementById('form').checkValidity() == false) {
                 this.$f7.input.validateInputs(document.getElementById('form'));
-            } else {
-                if (this.errorforce == true) {
-                    this.errorforce = false;
-                    
-                } else {                
+            } else {            
                     let formData = new FormData();
 
                     /*Add the form data we need to submit*/
@@ -287,9 +274,11 @@ export default {
                     formData.append('alamat', this.alamat);
                     formData.append('telp', this.telepon);
                     formData.append('fotoUser', this.file);
+                    formData.append('path', this.path);
                     formData.append('tgl', this.tgl);
                     formData.append('email', this.email);
-                    formData.append('pass', this.pass);
+                    formData.append('oldemail', this.oldemail);
+                    
 
                     // Display the key/value pairs
                     for (var pair of formData.entries()) {
@@ -297,19 +286,20 @@ export default {
                     }
                     
                     try {
-                        let user = await axios().post('/user/register/', formData);
+                        let user = await axios().put('/user/' + this.id, formData);
                         console.log('SUCCESS!!', user.data);
                         if (user.data.status == 500) {
                             this.$f7.dialog.alert(user.data.values, 'Terjadi Kesalahan');
                         } else {
                             this.$f7.dialog.alert(user.statusText, 'Berhasil'); 
-                            this.$f7router.navigate('/login/');
+                            this.$f7router.back('/home/tab5/', {
+                                force: true
+                            });
                         }
                     } catch (error) {
                         console.log('ERROR!!', error);
                         this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
                     }
-                }
             }
         },
         checkPass() {            

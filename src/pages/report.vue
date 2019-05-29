@@ -9,19 +9,19 @@
       <f7-block>
         <center>
           <div class="image-upload" raised @click="$refs.actionsOneGroup.open()">
-              <f7-icon material="camera_alt" size="100px" v-bind:class="{first: showPreview}"></f7-icon>
+              <f7-icon material="add_a_photo" size="100px" :class="{first: showPreview}"></f7-icon>
               <img id="myimg" ref="myimg" style="max-width: 200px; max-height: 200px;" 
-              v-bind:class="{preview: showPreview}" 
-              v-bind:src="imagePreview" 
+              :class="{preview: showPreview}" 
+              :src="imagePreview" 
               v-show="showPreview"/>
               <span>{{filename}}</span>
             <f7-actions ref="actionsOneGroup">
               <f7-actions-group>
                 <f7-actions-label bold>Unggah Foto</f7-actions-label>
-                <f7-actions-button v-if="camera" @click="openGallery">Galeri</f7-actions-button>
-                <f7-actions-button v-else @click="openGalleryWeb">Galeri</f7-actions-button>
-                <f7-actions-button @click="takePicture">Kamera</f7-actions-button>
-                <f7-actions-button bold color="red">Cancel</f7-actions-button>
+                <f7-actions-button v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                <f7-actions-button v-else @click="openGalleryWeb"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                <f7-actions-button @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
+                <f7-actions-button color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
               </f7-actions-group>
             </f7-actions>
             <input id="file-input" type="file" ref="file" accept="image/*" v-on:change="handleFileUpload()" required validate />
@@ -100,7 +100,7 @@
       </f7-block>
       <f7-block-title>Lokasi</f7-block-title>
       <f7-block>
-        <l-map style="height: 200px;" id="map" ref="myMap" :zoom="zoom" :center="center">
+        <l-map style="height: 200px;" id="map" ref="myMap" :zoom="zoom" :center="center" @click="addMarker">
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
           <l-marker id="marker"
           :class="{preview: showPreview}"
@@ -175,6 +175,9 @@ var geocodeService = geocoding.geocodeService();
 
         //exif
         metadata: null,
+
+        // error
+        err: false,
 
         //camera
         camera: navigator.camera
@@ -254,36 +257,41 @@ var geocodeService = geocoding.geocodeService();
       /*Submits the file to the server*/
       submitFile(){
         let self = this;
-        /*Initialize the form data*/
-            let formData = new FormData();
 
-            /*Add the form data we need to submit*/
-            formData.append('kat', this.kat);
-            formData.append('fotoLapor', this.file);
-            formData.append('desk', this.desk);
-            formData.append('lat', this.lat);
-            formData.append('long', this.lng);
-            formData.append('lokasi', this.address);
-            formData.append('vote', 0);
+        if (this.kat == '' || this.file == '' || this.desk == '' || this.address == null) {
+          self.$f7.dialog.alert('Pengisian laporan keluhan tidak lengkap', 'Terjadi Kesalahan');
+        } else {
+          /*Initialize the form data*/
+          let formData = new FormData();
 
-            // Display the key/value pairs
-            for (var pair of formData.entries()) {
-                console.log(pair[0]+ ': ' + pair[1]); 
-            }
-            
+          /*Add the form data we need to submit*/
+          formData.append('kat', this.kat);
+          formData.append('fotoLapor', this.file);
+          formData.append('desk', this.desk);
+          formData.append('lat', this.lat);
+          formData.append('long', this.lng);
+          formData.append('lokasi', this.address);
+          formData.append('vote', 0);
+          formData.append('asu', this.err);
 
-            /*Make the request to the POST /single-file URL*/
-            axios().post('/lapor/', formData)
-            .then(function(response){
-              console.log('SUCCESS!!', response);
-              self.$f7.dialog.alert(response.statusText, 'Berhasil'); 
-              self.$f7router.navigate('/report-list/');
-              })
-              .catch(function(error){
-                console.log('FAILURE!!', error.message);
-                self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');  
-                //self.$f7router.navigate('/home/');
-                });
+          // Display the key/value pairs
+          for (var pair of formData.entries()) {
+              console.log(pair[0]+ ': ' + pair[1]); 
+          }
+          
+
+          /*Make the request to the POST /single-file URL*/
+          axios().post('/lapor/', formData)
+          .then(function(response){
+            console.log('SUCCESS!!', response);
+            self.$f7.dialog.alert(response.statusText, 'Berhasil'); 
+            self.$f7router.navigate('/home/');
+            })
+          .catch(function(error){
+            console.log('FAILURE!!', error.message);
+            self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');
+          });
+        }
       },
 
       /*Handles a change on the file upload*/
@@ -328,47 +336,81 @@ var geocodeService = geocoding.geocodeService();
         EXIF.getData(file, function() {
           self.metadata = this.exifdata;
 
-          axios().post('/lapor/lokasi', this.exifdata)
+          axios().post('/lapor/geocode', this.exifdata)
           .then(function (response) {
             console.log(response.data);
+            if (response.data.status == 200) {
+              self.err = false;
+              self.lat = response.data.values[0].originLat;
+              self.lng = response.data.values[0].originLng;
 
-            self.lat = response.data.values[0].originLat;
-            self.lng = response.data.values[0].originLng;
+              self.marker = L.latLng(self.lat, self.lng);
+              self.center = L.latLng(self.lat, self.lng);
+              self.address = response.data.values[0].data.formattedAddress;
 
-            self.marker = L.latLng(self.lat, self.lng);
-            self.center = L.latLng(self.lat, self.lng);
-            self.address = response.data.values[0].data.formattedAddress;
-
-            self.$f7.preloader.hide();
+              self.$f7.preloader.hide();
+            } else {
+              self.err = true;
+              self.showPreview = true;
+              self.marker = L.latLng(0, 0);
+              self.address = null;
+              self.openToast('Foto tidak memiliki data lokasi');
+            }
           })
           .catch(function (error) {
+            
             console.log(error.message);
 
-            if(navigator.notification){
-                navigator.notification.alert("Tidak ditemukan lokasi pada foto!", self.default, "Error!");
-                self.showPreview = true;
-                self.marker = L.latLng(0, 0);
-                self.address = null;
-                self.$f7.dialog.close();
-              }else{
-                self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');  
-                self.showPreview = true;
-                self.marker = L.latLng(0, 0);
-                self.address = null;
-                self.$f7.dialog.close();
-              }
+            
+            self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');
+              
+            self.showPreview = true;
+            self.marker = L.latLng(0, 0);
+            self.address = null;
+              
           });
         });
       },
       removeMarker() {
       //this.markers.splice(index, 1);
       },
-      addMarker(e) {
-        geocodeService.reverse().latlng(e.latlng).run((error, result, response) => {
-          this.marker = result.latlng;
-          this.address = result.address.Match_addr;
-          console.log(response);
+      async addMarker(e) {
+        try {
+          if (this.err == true) {
+            this.$f7.preloader.show();
+            let response = await axios().post('/lapor/geocode', {
+              lat: e.latlng.lat,
+              lng: e.latlng.lng
+            });
+
+            this.lat = response.data.values[0].originLat;
+            this.lng = response.data.values[0].originLng;
+
+            this.marker = L.latLng(this.lat, this.lng);
+            this.center = L.latLng(this.lat, this.lng);
+            this.address = response.data.values[0].data.formattedAddress;
+            this.$f7.preloader.hide();
+            // this.marker = e.latlng;
+          } else {
+            this.openToast('Foto telah memiliki data lokasi');
+          }
+        } catch (error) {
+          this.address = null;
+          console.log(error.message);
+          this.$f7.preloader.hide();
+          this.openToast('Lokasi tidak ditemukan');
+        }
+      },
+      openToast(text) {
+        console.log(text);
+        
+        this.toastBottom = this.$f7.toast.create({
+          text: text,
+          closeTimeout: 3000,
         });
+        
+        // Open it
+        this.toastBottom.open();
       }
     }
   }
@@ -405,5 +447,10 @@ var geocodeService = geocoding.geocodeService();
 /* CHECKED STYLES */
 [type=radio]:checked + i {
   color: #007aff;
+}
+</style>
+<style>
+.leaflet-popup-close-button {
+  display: none;
 }
 </style>

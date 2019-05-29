@@ -25,6 +25,26 @@ export default {
               } else {
                   return Math.round(elapsed/msPerYear ) + ' tahun yang lalu';   
               }
+          },
+          formatTgl(tgl) {
+            let arrHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            let arrBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      
+            let date = new Date(tgl);
+            let tanggal = date.getDate();
+            let hari = date.getDay();
+            let bulan = date.getMonth();
+            let tahun = date.getFullYear();
+      
+            arrHari = arrHari[hari];
+            arrBulan = arrBulan[bulan];
+      
+            //let tahun = (year < 1000) ? year + 1900 : year;
+      
+            let hasil = arrHari + ', ' + tanggal + ' ' + arrBulan + ' ' + tahun;
+            
+            return hasil;
           }
     }
 }
