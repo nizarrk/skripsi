@@ -34,19 +34,26 @@ export default {
     },
     data() {
         return {
-            baseURL: 'http://192.168.1.12:3000',
+            baseURL: '',
             desk: '',
             items: []
         }
     },
     async created() {
-        this.$f7.preloader.show();
-        let result = await axios().get('/lapor/' + this.id);
-        this.$f7.preloader.hide();
-        this.desk = result.data.values[0].desk_lapor;
-        console.log(result.data.values);
-        
-        this.items = result.data.values[0];
+        try {
+            let baseURL = await axios().request();
+            this.baseURL = baseURL.config.baseURL;
+            this.$f7.preloader.show();
+            let result = await axios().get('/lapor/' + this.id);
+            this.$f7.preloader.hide();
+            this.desk = result.data.values[0].desk_lapor;
+            console.log(result.data.values);
+            
+            this.items = result.data.values[0];
+        } catch (error) {
+            console.log(error.message);
+            
+        }
     },
     methods: {
         async submitForm() {

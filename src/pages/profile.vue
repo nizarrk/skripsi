@@ -5,11 +5,11 @@
             <f7-link icon-ios="f7:gear" icon-md="material:settings" href="/settings/"></f7-link>
           </f7-nav-right>
         </f7-navbar>
-        <f7-block strong>
+        <f7-block>
               <f7-row>
                 <f7-col width="25">
                   <img :src="baseURL + items.foto_user" 
-                  style="border-radius:50px; max-width: 70px;"/>
+                  style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover;"/>
                 </f7-col>
                 <f7-col width="50">
                   <span style="font-size:18px;"><b>{{items.nama_user}}</b></span><br>
@@ -45,7 +45,7 @@
             <f7-list-item link="/izin-list/" title="Izin Penggunaan Jalan" :badge="items.total_izin">
               <f7-icon slot="media" md="material:note_add"></f7-icon>
             </f7-list-item>
-            <f7-list-item link="/survey/" title="Survey Kepuasan Masyarakat">
+            <f7-list-item link="/survey/" title="Survey Kepuasan">
               <f7-icon slot="media" md="material:assignment"></f7-icon>
             </f7-list-item>
             <f7-list-item link="/kritik-saran/" title="Kritik dan Saran">
@@ -62,19 +62,25 @@ import axios from '../config/axiosConfig';
 export default {
     data() {
       return {
-        baseURL: 'http://192.168.1.12:3000',
+        baseURL: '',
         items: []
       };
     },
     async created() {
-      this.$f7.preloader.show();
-      let result = await axios().get('/user/profile');
-      this.$f7.preloader.hide();
-      //console.log(result.data.values);
+      try {
+        let baseURL = await axios().request();
+        this.baseURL = baseURL.config.baseURL;
+        this.$f7.preloader.show();
+        let result = await axios().get('/user/profile');
+        this.$f7.preloader.hide();
+        //console.log(result.data.values);
 
-      this.items = result.data.values[0];
-      console.log(result.data);
-      
+        this.items = result.data.values[0];
+        console.log(result.data);
+      } catch (error) {
+        console.log(error.message);
+        
+      }      
     },
     methods: {
       async pullToRefresh(event, done) {

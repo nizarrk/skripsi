@@ -7,8 +7,8 @@
                 <f7-icon slot="media" md="material:brightness_2"></f7-icon>
                 <f7-toggle></f7-toggle>
             </f7-list-item>
-            <f7-list-item title="Ubah Kata Sandi" link="#">
-                <f7-icon slot="media" md="material:edit"></f7-icon>
+            <f7-list-item title="Ubah Kata Sandi" link="/settings-pass/">
+                <f7-icon slot="media" md="material:lock"></f7-icon>
             </f7-list-item>
             <f7-list-item title="Bantuan" link="#">
                 <f7-icon slot="media" md="material:help_outline"></f7-icon>

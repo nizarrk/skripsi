@@ -15,7 +15,7 @@
             <f7-actions ref="actionsOneGroup">
               <f7-actions-group>
                 <f7-actions-label bold>Unggah Foto</f7-actions-label>
-                <f7-actions-button bold v-if="navigator.camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                <f7-actions-button bold v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
                 <f7-actions-button bold v-else @click="openGalleryWeb"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
                 <f7-actions-button bold @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
                 <f7-actions-button bold color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
@@ -127,7 +127,7 @@
                 @input="confpass = $event.target.value"
                 @change="checkPass"
                 :error-message-force = errorforce
-                :error-message="error"
+                :error-message="err"
                 required
                 validate
                 clear-button
@@ -158,7 +158,7 @@ export default {
             email: null,
             pass: null,
             confpass: null,
-            error: 'Konfirmasi Password harus diisi',
+            err: 'Konfirmasi Password harus diisi',
             errorforce: false,
 
             //camera
@@ -220,7 +220,6 @@ export default {
                 //self.filename = fileEntry.fullPath.replace("/", "");
                 fileEntry.file(function(file){ //should return a raw HTML File Object
                     console.log('dari kamera: ', file);
-                    self.getLocation(file);
                 }, 
                 self.error); 
             },
@@ -315,10 +314,10 @@ export default {
         checkPass() {            
             if (this.pass != this.confpass) {
                 this.errorforce = true;
-                this.error = "Password tidak sesuai"
+                this.err = "Password tidak sesuai"
             } else {
                 this.errorforce = false;
-                this.error = "Konfirmasi Password harus diisi"
+                this.err = "Konfirmasi Password harus diisi"
             }
         }
     }

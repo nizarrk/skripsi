@@ -7,7 +7,7 @@
     </f7-navbar>
     <f7-block>
         <center>
-            <img style="border-radius:50px; max-width: 100px;" 
+            <img style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" 
             :src="imagePreview" /><br>
             <span>{{filename}}</span>
             <!-- <f7-link style="margin-left:-20px;" href="#"><f7-icon ios="f7:camera" md="material:camera_alt" size="34px"></f7-icon></f7-link> -->
@@ -116,7 +116,7 @@ export default {
     },
     data() {
         return {
-            baseURL: 'http://192.168.1.12:3000',
+            baseURL: '',
             // uploads
             filename: '',
             file: null,
@@ -138,24 +138,32 @@ export default {
         }
     },
     async created() {
-        this.$f7.preloader.show();
-        let result = await axios().get('/user/profile');
-        this.$f7.preloader.hide();
-        //console.log(result.data.values);
+        try {
+            let baseURL = await axios().request();
+            this.baseURL = baseURL.config.baseURL;
+            this.$f7.preloader.show();
+            let result = await axios().get('/user/profile');
+            this.$f7.preloader.hide();
+            //console.log(result.data.values);
 
-        this.nama = result.data.values[0].nama_user;
-        this.alamat = result.data.values[0].alamat_user;
-        this.telepon = result.data.values[0].telp_user;
-        let date = new Date(result.data.values[0].tgl_lahir_user);
-        let newdate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
-        console.log(newdate);
-        
-        this.tgl = newdate;
-        this.email = result.data.values[0].email_user;
-        this.oldemail = result.data.values[0].email_user;
-        this.path = result.data.values[0].foto_user;
-        this.imagePreview = this.baseURL + result.data.values[0].foto_user;
-        console.log(this.imagePreview);
+            this.nama = result.data.values[0].nama_user;
+            this.alamat = result.data.values[0].alamat_user;
+            this.telepon = result.data.values[0].telp_user;
+            let date = new Date(result.data.values[0].tgl_lahir_user);
+            let newdate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+            console.log(newdate);
+            
+            this.tgl = newdate;
+            this.email = result.data.values[0].email_user;
+            this.oldemail = result.data.values[0].email_user;
+            this.path = result.data.values[0].foto_user;
+            this.imagePreview = this.baseURL + result.data.values[0].foto_user;
+            console.log(this.imagePreview);   
+        } catch (error) {
+            console.log(error.message);
+            
+            
+        }
     },
     methods: {
         default(){
@@ -211,7 +219,7 @@ export default {
                 //self.filename = fileEntry.fullPath.replace("/", "");
                 fileEntry.file(function(file){ //should return a raw HTML File Object
                     console.log('dari kamera: ', file);
-                    self.getLocation(file);
+                    
                 }, 
                 self.error); 
             },

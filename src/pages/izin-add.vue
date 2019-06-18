@@ -6,68 +6,195 @@
       </f7-nav-right>
     </f7-navbar>
     <f7-block>
-      <center>
-        <f7-row no-gap>
-          <f7-col>
-            <f7-block-title>Surat Lurah</f7-block-title>
-            <div class="image-upload" raised @click="$refs.actionsOneGroup.open()">
-                <f7-icon material="add_to_photos" size="100px" :class="{first: showPreview}"></f7-icon>
-                <img id="myimg" ref="myimg" style="max-width: 170px; max-height: 170px;" 
-                :class="{preview: showPreview}" 
-                :src="imagePreview" 
-                v-show="showPreview"/>
-                <!-- <span>{{filename}}</span> -->
-              <f7-actions ref="actionsOneGroup">
-                <f7-actions-group>
-                  <f7-actions-label bold>Unggah Foto</f7-actions-label>
-                  <f7-actions-button v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
-                  <f7-actions-button v-else @click="openGalleryWeb('surat')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
-                  <f7-actions-button @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
-                  <f7-actions-button color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
-                </f7-actions-group>
-              </f7-actions>
-              <input id="file" type="file" ref="file" accept="image/*" v-on:change="handleFileUpload()" required validate />
+      <f7-list form id="form">
+        <li class="item-content item-input">
+          <div class="item-inner">
+            <div class="item-title item-label">Jenis Kegiatan</div>
+            <!-- additional "input-dropdown-wrap" class -->
+            <div class="item-input-wrap input-dropdown-wrap">
+              <select v-model="selected">
+                <option disabled value="">-- Pilih --</option>
+                <option>Bazaar / Pasar malam dan sejenisnya</option>
+                <option>Road race</option>
+                <option>Sirkus</option>
+                <option>Orkes / konser musik dan sejenisnya</option>
+                <option>Pertunjukan Wayang / Ludruk dan sejenisnya</option>
+                <option>Perorangan / pernikahan, khitanan atau lainnya</option>
+                <option>Lainnya</option>
+              </select>
             </div>
-          </f7-col>
-          <f7-col>
-            <f7-block-title>Kartu Tanda Penduduk</f7-block-title>
-            <div class="image-upload" raised @click="$refs.actionsOneGroup2.open()">
-                <f7-icon material="add_to_photos" size="100px" :class="{first: showPreview2}"></f7-icon>
-                <img id="myimg" ref="myimg" style="max-width: 170px; max-height: 170px;" 
-                :class="{preview: showPreview2}" 
-                :src="imagePreview2" 
-                v-show="showPreview2"/>
-                <!-- <span>{{filename}}</span> -->
-              <f7-actions ref="actionsOneGroup2">
-                <f7-actions-group>
-                  <f7-actions-label bold>Unggah Foto</f7-actions-label>
-                  <f7-actions-button v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
-                  <f7-actions-button v-else @click="openGalleryWeb('ktp')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
-                  <f7-actions-button @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
-                  <f7-actions-button color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
-                </f7-actions-group>
-              </f7-actions>
-              <input id="file2" type="file" ref="file2" accept="image/*" v-on:change="handleFileUpload2()" required validate />
+          </div>
+        </li>
+        <f7-list-input
+            v-show="selected == 'Lainnya'"
+            type="text"
+            placeholder="Lainnya"
+            :value="form.desk"
+            @input="form.desk = $event.target.value"
+            :required="selected == 'Lainnya'"
+            validate
+            clear-button
+        >
+        </f7-list-input>
+        <f7-list-input
+            label="Lokasi Kegiatan"
+            type="textarea"
+            placeholder="Misal: Jl. Jawa"
+            :value="form.loc"
+            @input="form.loc = $event.target.value"
+            required
+            validate
+            clear-button
+        >
+        </f7-list-input>
+        <li>
+          <f7-row>
+            <f7-col>
+              <div class="item-content item-input">
+                <div class="item-inner">
+                  <div class="item-title item-label">Tanggal Mulai</div>
+                  <div class="item-input-wrap">
+                    <input type="date" :min="today" :value="form.tglmulai"
+                    @input="form.tglmulai = $event.target.value"
+                    required
+                    validate
+                    >
+                  </div>
+                </div>
+              </div>
+            </f7-col>
+            <f7-col>
+              <div class="item-content item-input">
+                <div class="item-inner">
+                  <div class="item-title item-label">Tanggal Selesai</div>
+                  <div class="item-input-wrap">
+                    <input type="date" :min="form.tglmulai" :value="form.tglend"
+                    @input="form.tglend = $event.target.value"
+                    required
+                    validate
+                    >
+                  </div>
+                </div>
+              </div>
+            </f7-col>
+          </f7-row>
+        </li>
+        <li>
+          <f7-row>
+            <f7-col>
+              <div class="item-content item-input">
+                <div class="item-inner">
+                  <div class="item-title item-label">Jam Mulai</div>
+                  <div class="item-input-wrap">
+                    <input type="time" :min="now" :value="form.jammulai"
+                    @input="form.jammulai = $event.target.value"
+                    required
+                    validate
+                    >
+                  </div>
+                </div>
+              </div>
+            </f7-col>
+            <f7-col>
+              <div class="item-content item-input">
+                <div class="item-inner">
+                  <div class="item-title item-label">Jam Selesai</div>
+                  <div class="item-input-wrap">
+                    <input type="time" :min="form.jammulai" :value="form.jamend"
+                    @input="form.jamend = $event.target.value"
+                    required
+                    validate
+                    >
+                  </div>
+                </div>
+              </div>
+            </f7-col>
+          </f7-row>
+        </li>
+        <li>
+          <f7-block-title>Lampiran</f7-block-title>
+          <div class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Surat Pengantar dari Kelurahan</div>
+              <div class="item-input-wrap">
+                <div style="padding: 20px;" class="image-upload" raised @click="$refs.actionsOneGroup.open()">
+                    <f7-icon material="add_to_photos" size="70px" :class="{first: showPreview}"></f7-icon>
+                    <img id="myimg" ref="myimg" style="max-width: 170px; max-height: 170px;" 
+                    :class="{preview: showPreview}" 
+                    :src="imagePreview" 
+                    v-show="showPreview"/>
+                    <!-- <span>{{filename}}</span> -->
+                  <f7-actions ref="actionsOneGroup">
+                    <f7-actions-group>
+                      <f7-actions-label bold>Unggah Foto</f7-actions-label>
+                      <f7-actions-button v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                      <f7-actions-button v-else @click="openGalleryWeb('surat')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                      <f7-actions-button @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
+                      <f7-actions-button color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
+                    </f7-actions-group>
+                  </f7-actions>
+                  <input id="file" type="file" ref="file" accept="image/*" v-on:change="handleFileUpload()" required validate />
+                </div>
+              </div>
             </div>
-          </f7-col>
-        </f7-row>
-      </center>
+          </div>
+        </li>
+        <li>
+          <div class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Kartu Tanda Penduduk</div>
+              <div class="item-input-wrap">
+                <div style="padding: 20px;" class="image-upload" raised @click="$refs.actionsOneGroup2.open()">
+                    <f7-icon material="add_to_photos" size="70px" :class="{first: showPreview2}"></f7-icon>
+                    <img id="myimg" ref="myimg" style="max-width: 170px; max-height: 170px;" 
+                    :class="{preview: showPreview2}" 
+                    :src="imagePreview2" 
+                    v-show="showPreview2"/>
+                    <!-- <span>{{filename}}</span> -->
+                  <f7-actions ref="actionsOneGroup2">
+                    <f7-actions-group>
+                      <f7-actions-label bold>Unggah Foto</f7-actions-label>
+                      <f7-actions-button v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                      <f7-actions-button v-else @click="openGalleryWeb('ktp')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                      <f7-actions-button @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
+                      <f7-actions-button color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
+                    </f7-actions-group>
+                  </f7-actions>
+                  <input id="file2" type="file" ref="file2" accept="image/*" v-on:change="handleFileUpload2()" required validate />
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Kartu Keluarga</div>
+              <div class="item-input-wrap">
+                <div style="padding: 20px;" class="image-upload" raised @click="$refs.actionsOneGroup3.open()">
+                    <f7-icon material="add_to_photos" size="70px" :class="{first: showPreview3}"></f7-icon>
+                    <img id="myimg" ref="myimg" style="max-width: 170px; max-height: 170px;" 
+                    :class="{preview: showPreview3}" 
+                    :src="imagePreview3" 
+                    v-show="showPreview3"/>
+                    <!-- <span>{{filename}}</span> -->
+                  <f7-actions ref="actionsOneGroup3">
+                    <f7-actions-group>
+                      <f7-actions-label bold>Unggah Foto</f7-actions-label>
+                      <f7-actions-button v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                      <f7-actions-button v-else @click="openGalleryWeb('kk')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                      <f7-actions-button @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
+                      <f7-actions-button color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
+                    </f7-actions-group>
+                  </f7-actions>
+                  <input id="file3" type="file" ref="file3" accept="image/*" v-on:change="handleFileUpload3()" required validate />
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+      </f7-list>      
     </f7-block>
-    <f7-block>
-        <f7-list form id="form">
-            <f7-list-input
-                label="Deskripsi Izin Penggunaan Jalan"
-                type="textarea"
-                placeholder="Deskripsi"
-                :value="desk"
-                @input="desk = $event.target.value"
-                required
-                validate
-                clear-button
-            >
-            </f7-list-input>
-        </f7-list>
-    </f7-block>   
   </f7-page>
 </template>
 
@@ -80,19 +207,47 @@ import axios from '../config/axiosConfig';
     */
     data(){
       return {
-        baseURL: 'http://192.168.1.12:3000',
         file: '',
         file2: '',
+        file3: '',
         showPreview: false,
         imagePreview: '',
         showPreview2: false,
         imagePreview2: '',
-        desk: null,
+        showPreview3: false,
+        imagePreview3: '',
+
+        // form
+        form: {
+          desk: '',
+          loc: '',
+          tglmulai: null,
+          tglend: null,
+          jammulai: null,
+          jamend: null
+        },
+
+        selected: '',
+
+        today: null,
+        now: null,
+
         //camera
         camera: navigator.camera
       }
     },
-
+    created() {
+      let date = new Date();
+      let newdate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+      let jam = ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+      console.log(jam);
+      this.today = newdate;
+      this.now = jam;
+      this.form.tglmulai = newdate;
+      this.form.tglend = newdate;
+      this.form.jammulai = jam;
+      this.form.jamend = jam;
+    },
     methods: {
       default(){
         console.log('defaultCallback');
@@ -104,11 +259,15 @@ import axios from '../config/axiosConfig';
           this.$refs.actionsOneGroup.close();
           console.log('surat');
           
-        } else {
+        } else if (string == 'ktp') {
           document.getElementById('file2').click();
           this.$refs.actionsOneGroup2.close();
           console.log('ktp');
           
+        } else {
+          document.getElementById('file3').click();
+          this.$refs.actionsOneGroup3.close();
+          console.log('kk');
         }
       },
       //get photo from gallery
@@ -174,30 +333,36 @@ import axios from '../config/axiosConfig';
       },
       async submitForm() {
             try {
-              if (this.file =='' || this.file2 == '' || this.desk == null) {
-                this.$f7.input.validateInputs(document.getElementsByTagName('input'));
-                this.$f7.dialog.alert('Harap lengkapi pengisian form', 'Terjadi Kesalahan');
+              if (document.getElementById('form').checkValidity() == false) {
+                this.$f7.dialog.alert('Lengkapi pengisan form', 'Terjadi Kesalahan');
               } else {
                 let formData = new FormData();
 
                 /*Add the form data we need to submit*/
+                formData.append('desk', this.form.desk ? this.form.desk : this.selected);
+                formData.append('loc', this.form.loc);
+                formData.append('tglmulai', this.form.tglmulai);
+                formData.append('tglend', this.form.tglend);
+                formData.append('jammulai', this.form.jammulai);
+                formData.append('jamend', this.form.jamend);
                 formData.append('fotoSurat', this.file);
                 formData.append('fotoKTP', this.file2);
-                formData.append('desk', this.desk);
+                formData.append('fotoKK', this.file3);
 
                 // Display the key/value pairs
                 for (var pair of formData.entries()) {
                     console.log(pair[0]+ ': ' + pair[1]); 
                 }
 
-
+                this.$f7.preloader.show();
                 let result = await axios().post('/izin/', formData);
                 console.log(result.data);
+                this.$f7.preloader.hide();
                 this.$f7.dialog.alert(result.statusText, 'Berhasil'); 
                 this.$f7router.back('', {
                   force: true
                 });
-                }
+              }
             } catch (error) {
               console.log(error.message);
                 
@@ -282,6 +447,44 @@ import axios from '../config/axiosConfig';
               display the image in the preview.
             */
             reader2.readAsDataURL( this.file2 );
+          }
+        }
+      },
+      handleFileUpload3(){
+        /*
+          Set the local file variable to what the user has selected.
+        */
+        this.file3 = this.$refs.file3.files[0];
+
+        /*
+          Initialize a File Reader object
+        */
+        let reader3  = new FileReader();
+
+        /*
+          Add an event listener to the reader that when the file
+          has been loaded, we flag the show preview as true and set the
+          image to be what was read from the reader.
+        */
+        reader3.addEventListener("load", function () {
+          this.showPreview3 = true;
+          this.imagePreview3 = reader3.result;
+        }.bind(this), false);
+
+        /*
+          Check to see if the file is not empty.
+        */
+        if( this.file3 ){
+          /*
+            Ensure the file is an image file.
+          */
+          if ( /\.(jpe?g|png|gif)$/i.test( this.file3.name ) ) {
+            /*
+              Fire the readAsDataURL method which will read the file in and
+              upon completion fire a 'load' event which we will listen to and
+              display the image in the preview.
+            */
+            reader3.readAsDataURL( this.file3 );
           }
         }
       }

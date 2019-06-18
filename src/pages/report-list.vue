@@ -38,17 +38,24 @@ import date from '../mixins/dateConfig';
 export default {
   data() {
     return {
-      baseURL: 'http://192.168.1.12:3000',
+      baseURL: '',
       items: []
     }
   },
   async created() {
-    this.$f7.preloader.show();
-    let result = await axios().get('/lapor/laporku');
-    this.$f7.preloader.hide();
-    console.log(result.data.values);
+    try {
+      let baseURL = await axios().request();
+      this.baseURL = baseURL.config.baseURL;
+      this.$f7.preloader.show();
+      let result = await axios().get('/lapor/laporku');
+      this.$f7.preloader.hide();
+      console.log(result.data.values);
 
-    this.items = result.data.values;
+      this.items = result.data.values;
+    } catch (error) {
+      console.log(error.message);
+      
+    }
   },
   methods: {
     async pullToRefresh(event, done) {

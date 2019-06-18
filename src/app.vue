@@ -96,10 +96,10 @@ export default {
       // Decode JWT token and return payload
       let decode = this.$jwt.decode(localStorage.getItem('token'));
       console.log('decode', decode);
-      console.log(parseInt(decode.exp));
 
       if (decode.exp < Date.now() / 1000) {
         localStorage.removeItem('token');
+        this.$f7.preloader.hide();
         this.$f7router.navigate('/login/');
       } else {
         console.log('token valid');

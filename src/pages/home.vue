@@ -18,7 +18,7 @@
     <f7-card class="demo-facebook-card" v-for="(item, index) in items" :key="index">
       <f7-card-header class="no-border" :laporid="item.id_lapor">
         <div class="demo-facebook-avatar">
-          <img :src="baseURL + item.foto_user" style="width: 34px; border-radius: 20px;"/>
+          <img :src="baseURL + item.foto_user" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"/>
         </div>
         <div class="demo-facebook-name">{{item.nama_user}}</div>
         <div class="demo-facebook-date">{{timeDifference(item.tgl_lapor)}}</div>
@@ -26,7 +26,7 @@
       <f7-card-content>
         <p>{{item.desk_lapor}}</p>
         <a :href="'/report-detail/' + item.id_lapor">
-        <img :src="baseURL + item.foto_lapor" width="100%"/>
+        <img :src="baseURL + item.foto_lapor" style="width: 100%; height: 300px; object-fit: cover;"/>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Angkutan Umum'"><f7-icon material="directions_bus" size="15px"></f7-icon><span> Angkutan Umum</span></span>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Lalu Lintas'"><f7-icon material="traffic" size="15px"></f7-icon><span> Lalu Lintas</span></span>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Perparkiran'"><f7-icon material="local_parking" size="15px"></f7-icon><span> Perparkiran</span></span>
@@ -34,12 +34,13 @@
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Pengendalian Operasi'"><f7-icon material="directions_walk" size="15px"></f7-icon><span> Pengendalian Operasi</span></span>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Layanan'"><f7-icon material="people" size="15px"></f7-icon><span> Layanan</span></span>
         <p class="likes"><f7-icon md="material:place" size="15px"></f7-icon>{{item.lokasi_lapor}}</p>
-        <p class="likes">Likes: {{item.vote_lapor}} &nbsp;&nbsp; Comments: {{item.total_komentar}}</p>
+        <p class="likes">Likes: {{item.total_vote}} &nbsp;&nbsp; Comments: {{item.total_komentar}}</p>
         </a>
       </f7-card-content>
       <f7-card-footer class="no-border">
-        <f7-link><f7-icon material="thumb_up" size="20px"></f7-icon> Like</f7-link>
-        <f7-link><f7-icon material="comment" size="20px"></f7-icon> Comment</f7-link>
+        <f7-link v-if="item.pernah_vote == 1" style="color: #2999F3" @click="deleteVote(item.id_vote)"><f7-icon material="thumb_up" size="20px"></f7-icon> Like</f7-link>
+        <f7-link v-else @click="vote(item.id_lapor)"><f7-icon material="thumb_up" size="20px"></f7-icon> Like</f7-link>
+        <f7-link :href="'/comments/' + item.id_lapor"><f7-icon material="comment" size="20px"></f7-icon> Comment</f7-link>
         <f7-link><f7-icon material="share" size="20px"></f7-icon> Share</f7-link>
       </f7-card-footer>
     </f7-card>
@@ -53,16 +54,21 @@ import axios from '../config/axiosConfig';
 export default {
     data() {
       return {
-        baseURL: 'http://192.168.1.12:3000',
-        items: []
+        baseURL: '',
+        items: [],
+        state: ''
       };
     },
     async created() {
       try {
         this.$f7.preloader.show();
+        let baseURL = await axios().request();
+        this.baseURL = baseURL.config.baseURL;
         let result = await axios().get('/lapor');
         this.$f7.preloader.hide();
-        console.log(result.data.values.length);
+        console.log(result.data.values);
+        
+        
 
         this.items = result.data.values;
       } catch (error) {
@@ -80,6 +86,37 @@ export default {
           
           done();
         }, 1000);
+      },
+      async vote(id) {
+        try {
+          let vote = await axios().post('/lapor/vote', {
+            idlapor: id
+          });
+          console.log('tambah vote', vote);
+          this.state = 'tambah';
+        } catch (error) {
+          console.log(error.message);
+          
+        }
+      },
+      async deleteVote(id) {
+        try {
+          let vote = await axios().delete('/lapor/vote/' + id);
+          console.log('delete vote', vote);
+          this.state = 'hapus';
+        } catch (error) {
+          console.log(error.message);
+          
+        }
+      }
+    },
+    watch: {
+      state: {
+        async handler() {
+            console.log(this.state);
+            let result = await axios().get('/lapor');
+            this.items = result.data.values;       
+        }
       }
     },
     mixins: [date]

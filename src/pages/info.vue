@@ -11,15 +11,15 @@
     <f7-tabs swipeable>
       <f7-tab id="tab-1" class="page-content" tab-active>
         <f7-block>
-          <f7-card class="demo-card-header-pic">
+          <f7-card class="demo-card-header-pic" v-for="(item, index) in info" :key="index">
             <f7-card-header
               class="no-border"
               valign="bottom"
-              style="background-image:url(https://cdn.framework7.io/placeholder/nature-1000x600-3.jpg)"
-            >Berita</f7-card-header>
+              :style="{ backgroundImage: 'url(' + baseURL + item.foto_info + ')' }"
+            >{{item.judul_info}}</f7-card-header>
             <f7-card-content>
-              <p class="date">Posted on January 21, 2015</p>
-              <p>Quisque eget vestibulum nulla. Quisque quis dui quis ex ultricies efficitur vitae non felis. Phasellus quis nibh hendrerit...</p>
+              <p class="date">{{formatTgl(item.tgl_info)}}</p>
+              <p>{{item.desk_info | limitToDisplay(item.desk_info)}}</p>
             </f7-card-content>
             <f7-card-footer>
               <f7-link>Read more</f7-link>
@@ -29,49 +29,63 @@
       </f7-tab>
       <f7-tab id="tab-2" class="page-content">
         <f7-block>
-          <f7-card class="demo-card-header-pic">
-            <f7-card-header
-              class="no-border"
-              valign="bottom"
-              style="background-image:url(https://cdn.framework7.io/placeholder/nature-1000x600-3.jpg)"
-            >Trayek</f7-card-header>
-            <f7-card-content>
-              <p class="date">Posted on January 21, 2015</p>
-              <p>Quisque eget vestibulum nulla. Quisque quis dui quis ex ultricies efficitur vitae non felis. Phasellus quis nibh hendrerit...</p>
-            </f7-card-content>
-            <f7-card-footer>
-              <f7-link>Read more</f7-link>
-            </f7-card-footer>
-          </f7-card>
+          <div class="card card-outline" v-for="(item, index) in trayek" :key="index">
+            <div class="card-header">{{item.nama_trayek}}</div>
+            <div class="card-content card-content-padding">
+              <p>{{item.rute_trayek}}</p>
+            </div>
+            <div class="card-footer"><f7-link :href="'/info-trayek/' + item.id_trayek">Lihat Detail</f7-link></div>
+          </div>
         </f7-block>
       </f7-tab>
       <f7-tab id="tab-3" class="page-content">
         <f7-block>
-          <f7-card class="demo-card-header-pic">
-            <f7-card-header
-              class="no-border"
-              valign="bottom"
-              style="background-image:url(https://cdn.framework7.io/placeholder/nature-1000x600-3.jpg)"
-            >Parkir</f7-card-header>
-            <f7-card-content>
-              <p class="date">Posted on January 21, 2015</p>
-              <p>Quisque eget vestibulum nulla. Quisque quis dui quis ex ultricies efficitur vitae non felis. Phasellus quis nibh hendrerit...</p>
-            </f7-card-content>
-            <f7-card-footer>
-              <f7-link>Read more</f7-link>
-            </f7-card-footer>
-          </f7-card>
+          <center><span style="font-size: 17px; color: #8e8e93;">Tidak Ada Data.</span></center>
         </f7-block>
       </f7-tab>
     </f7-tabs>
   </f7-page>
 </template>
 <script>
+import axios from '../config/axiosConfig';
+import date from '../mixins/dateConfig';
+
   export default {
     data() {
       return {
-      };
-    }
+        baseURL: '',
+        info: [],
+        trayek: []
+      }
+    },
+    async created() {
+      try {
+        this.$f7.preloader.show();
+        let baseURL = await axios().request();
+        this.baseURL = baseURL.config.baseURL;
+        let info = await axios().get('/info');
+        let trayek = await axios().get('/info/trayek');
+
+        this.info = info.data.values;
+        this.trayek = trayek.data.values;
+
+        console.log('info', this.info);
+        console.log('trayek', this.trayek);
+        
+        
+
+        this.$f7.preloader.hide();
+      } catch (error) {
+        
+      }      
+    },
+    filters: {
+        limitToDisplay(text) {
+            return text.substring(0, 200) + '....';
+            
+        }
+    },
+    mixins: [date]
   }
 </script>
 <style scoped>

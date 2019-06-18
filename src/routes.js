@@ -10,8 +10,10 @@ import EditProfile from './pages/profile-edit.vue';
 import TabRoute from './pages/tabs-routable.vue';
 import TabSwipe from './pages/tabs-swipeable.vue';
 import Info from './pages/info.vue';
+import InfoTrayek from './pages/info-trayek.vue';
 import Themes from './pages/color-theme.vue';
 import Settings from './pages/settings.vue';
+import SettingsPass from './pages/settings-pass.vue';
 import Notifications from './pages/notifications.vue';
 import Report from './pages/report.vue';
 import ReportList from './pages/report-list.vue';
@@ -89,12 +91,20 @@ export default [
     component: Info,
   },
   {
+    path: '/info-trayek/:id',
+    component: InfoTrayek,
+  },
+  {
     path: '/themes/',
     component: Themes,
   },
   {
     path: '/settings/',
     component: Settings,
+  },
+  {
+    path: '/settings-pass/',
+    component: SettingsPass,
   },
   {
     path: '/profile-edit/:id',

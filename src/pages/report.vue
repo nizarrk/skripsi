@@ -160,6 +160,7 @@ var geocodeService = geocoding.geocodeService();
         attribution:'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
         marker: L.latLng(0, 0), 
         address: null,
+        district: null,
 
         //upload
         filename: '',
@@ -232,6 +233,9 @@ var geocodeService = geocoding.geocodeService();
         this.imagePreview = imagePath;
         this.showPreview = false;
 
+        console.log(imagePath);
+        
+
         window.resolveLocalFileSystemURL(imagePath, 
           function(fileEntry){
               //alert("got image file entry: " + fileEntry.fullPath);
@@ -269,10 +273,10 @@ var geocodeService = geocoding.geocodeService();
           formData.append('fotoLapor', this.file);
           formData.append('desk', this.desk);
           formData.append('lat', this.lat);
-          formData.append('long', this.lng);
+          formData.append('lng', this.lng);
           formData.append('lokasi', this.address);
-          formData.append('vote', 0);
-          formData.append('asu', this.err);
+          formData.append('district', this.district);
+          formData.append('status', this.err);
 
           // Display the key/value pairs
           for (var pair of formData.entries()) {
@@ -347,6 +351,7 @@ var geocodeService = geocoding.geocodeService();
               self.marker = L.latLng(self.lat, self.lng);
               self.center = L.latLng(self.lat, self.lng);
               self.address = response.data.values[0].data.formattedAddress;
+              self.district = response.data.values[0].data.district;
 
               self.$f7.preloader.hide();
             } else {
@@ -354,6 +359,8 @@ var geocodeService = geocoding.geocodeService();
               self.showPreview = true;
               self.marker = L.latLng(0, 0);
               self.address = null;
+              self.district = null;
+              self.$f7.preloader.hide();
               self.openToast('Foto tidak memiliki data lokasi');
             }
           })
@@ -367,7 +374,7 @@ var geocodeService = geocoding.geocodeService();
             self.showPreview = true;
             self.marker = L.latLng(0, 0);
             self.address = null;
-              
+            self.district = null;
           });
         });
       },
@@ -389,6 +396,7 @@ var geocodeService = geocoding.geocodeService();
             this.marker = L.latLng(this.lat, this.lng);
             this.center = L.latLng(this.lat, this.lng);
             this.address = response.data.values[0].data.formattedAddress;
+            this.district = response.data.values[0].data.district;
             this.$f7.preloader.hide();
             // this.marker = e.latlng;
           } else {
@@ -396,6 +404,7 @@ var geocodeService = geocoding.geocodeService();
           }
         } catch (error) {
           this.address = null;
+          this.district = null;
           console.log(error.message);
           this.$f7.preloader.hide();
           this.openToast('Lokasi tidak ditemukan');
