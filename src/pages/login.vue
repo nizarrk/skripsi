@@ -53,9 +53,13 @@ import axios from '../config/axiosConfig';
             email: this.email,
             pass: this.password
           });
-
-          localStorage.setItem('token', user.data.token);
-          router.navigate('/home/');
+          
+          if (user.data.admin == 'true') {
+            this.$f7.dialog.alert('Kombinasi email dan password salah!', 'Terjadi Kesalahan');
+          } else {
+            localStorage.setItem('token', user.data.token);
+            router.navigate('/home/');
+          }
           
         } catch (error) {
           console.log(error.message);

@@ -68,6 +68,7 @@
 <script>
 // Import Routes
 import routes from './routes.js';
+import { alert } from '../plugins/cordova-plugin-dialogs/www/browser/notification';
 
 export default {
   data() {
@@ -98,9 +99,10 @@ export default {
       console.log('decode', decode);
 
       if (decode.exp < Date.now() / 1000) {
-        localStorage.removeItem('token');
         this.$f7.preloader.hide();
+        localStorage.removeItem('token');
         this.$f7router.navigate('/login/');
+        console.log('token not valid');
       } else {
         console.log('token valid');
         

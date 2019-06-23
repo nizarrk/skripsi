@@ -215,16 +215,23 @@ export default {
             this.showPreview = false;
 
             window.resolveLocalFileSystemURL(imagePath, 
-            function(fileEntry){
-                //alert("got image file entry: " + fileEntry.fullPath);
-                //self.filename = fileEntry.fullPath.replace("/", "");
-                fileEntry.file(function(file){ //should return a raw HTML File Object
-                    console.log('dari kamera: ', file);
-                }, 
-                self.error); 
-            },
-            this.error
-            );          
+          function(fileEntry){
+              //alert("got image file entry: " + fileEntry.fullPath);
+              //self.filename = fileEntry.fullPath.replace("/", "");
+              fileEntry.file(function(file){ //should return a raw HTML File Object
+                let reader = new FileReader();
+                    reader.onloadend = function(e) {
+                    let imgBlob = new Blob([ this.result ], { type: "image/jpeg" } );
+                    self.file = imgBlob;
+                };
+                reader.readAsArrayBuffer(file); // or the way you want to read it
+                console.log('dari kamera: ', file);
+                self.$f7.preloader.hide();
+              }, 
+              self.error); 
+          },
+          this.error
+        );          
         },
         error(err){
             if(navigator.notification){

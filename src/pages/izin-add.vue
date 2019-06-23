@@ -127,13 +127,13 @@
                   <f7-actions ref="actionsOneGroup">
                     <f7-actions-group>
                       <f7-actions-label bold>Unggah Foto</f7-actions-label>
-                      <f7-actions-button v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                      <f7-actions-button v-if="camera" @click="openGallery('surat')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
                       <f7-actions-button v-else @click="openGalleryWeb('surat')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
-                      <f7-actions-button @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
+                      <f7-actions-button @click="takePicture('surat')"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
                       <f7-actions-button color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
                     </f7-actions-group>
                   </f7-actions>
-                  <input id="file" type="file" ref="file" accept="image/*" v-on:change="handleFileUpload()" required validate />
+                  <input id="file" type="file" ref="file" accept="image/*" v-on:change="handleFileUpload()" />
                 </div>
               </div>
             </div>
@@ -154,13 +154,13 @@
                   <f7-actions ref="actionsOneGroup2">
                     <f7-actions-group>
                       <f7-actions-label bold>Unggah Foto</f7-actions-label>
-                      <f7-actions-button v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                      <f7-actions-button v-if="camera" @click="openGallery('ktp')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
                       <f7-actions-button v-else @click="openGalleryWeb('ktp')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
-                      <f7-actions-button @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
+                      <f7-actions-button @click="takePicture('ktp')"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
                       <f7-actions-button color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
                     </f7-actions-group>
                   </f7-actions>
-                  <input id="file2" type="file" ref="file2" accept="image/*" v-on:change="handleFileUpload2()" required validate />
+                  <input id="file2" type="file" ref="file2" accept="image/*" v-on:change="handleFileUpload2()" />
                 </div>
               </div>
             </div>
@@ -181,13 +181,13 @@
                   <f7-actions ref="actionsOneGroup3">
                     <f7-actions-group>
                       <f7-actions-label bold>Unggah Foto</f7-actions-label>
-                      <f7-actions-button v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                      <f7-actions-button v-if="camera" @click="openGallery('kk')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
                       <f7-actions-button v-else @click="openGalleryWeb('kk')"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
-                      <f7-actions-button @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
+                      <f7-actions-button @click="takePicture('kk')"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
                       <f7-actions-button color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
                     </f7-actions-group>
                   </f7-actions>
-                  <input id="file3" type="file" ref="file3" accept="image/*" v-on:change="handleFileUpload3()" required validate />
+                  <input id="file3" type="file" ref="file3" accept="image/*" v-on:change="handleFileUpload3()" />
                 </div>
               </div>
             </div>
@@ -207,6 +207,7 @@ import axios from '../config/axiosConfig';
     */
     data(){
       return {
+        type: '',
         file: '',
         file2: '',
         file3: '',
@@ -237,6 +238,8 @@ import axios from '../config/axiosConfig';
       }
     },
     created() {
+      // Listen to Cordova's backbutton event
+      document.addEventListener('backbutton', this.navigateBack , false);
       let date = new Date();
       let newdate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
       let jam = ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
@@ -249,6 +252,19 @@ import axios from '../config/axiosConfig';
       this.form.jamend = jam;
     },
     methods: {
+      navigateBack() {
+        let app = this.$f7;
+        let $$ = this.$$;
+        // Use Framework7's router to navigate back
+        let mainView = app.views.main;          
+        if (app.views.main.router.url == '/home/tab1') {
+            navigator.app.exitApp();
+        } else {
+          mainView.router.back('', {
+            force: true
+          });
+        }
+      },
       default(){
         console.log('defaultCallback');
         
@@ -271,7 +287,14 @@ import axios from '../config/axiosConfig';
         }
       },
       //get photo from gallery
-      openGallery(){
+      openGallery(string){
+        if (string == 'surat') {
+          this.type = 'surat';
+        } else if (string == 'ktp') {
+          this.type = 'ktp';
+        } else if (string == 'kk') {
+          this.type = 'kk';
+        }
         if (navigator.camera){
              // Retrieve image file location from specified source
             navigator.camera.getPicture(this.setPicture, this.error, { 
@@ -284,7 +307,14 @@ import axios from '../config/axiosConfig';
            }
       },
       // Use the camera plugin to capture image
-      takePicture() {
+      takePicture(string) {
+        if (string == 'surat') {
+          this.type = 'surat';
+        } else if (string == 'ktp') {
+          this.type = 'ktp';
+        } else if (string == 'kk') {
+          this.type = 'kk';
+        }
         if (navigator.camera) {
           navigator.camera.getPicture(this.setPicture, this.error, {
             quality: 80,
@@ -293,8 +323,6 @@ import axios from '../config/axiosConfig';
             mediaType: Camera.MediaType.PICTURE,
             encodingType: Camera.EncodingType.JPEG,
             cameraDirection: Camera.Direction.BACK,
-            targetWidth: 300,
-            targetHeight: 400
           });
         }else{
           // If the navigator.camera is not available display generic error to the user.
@@ -305,35 +333,90 @@ import axios from '../config/axiosConfig';
       // this action will automatically update the view.
       setPicture(imagePath){
         let self = this;
-        this.$f7.preloader.show();
-        this.imagePreview = imagePath;
-        this.showPreview = false;
+        if (this.type == 'surat') {
+          console.log('surat');
+          this.$f7.preloader.show();
+          this.imagePreview = imagePath;
+          this.showPreview = true;
 
-        window.resolveLocalFileSystemURL(imagePath, 
-          function(fileEntry){
-              //alert("got image file entry: " + fileEntry.fullPath);
-              //self.filename = fileEntry.fullPath.replace("/", "");
-              fileEntry.file(function(file){ //should return a raw HTML File Object
-                console.log('dari kamera: ', file);
-                self.getLocation(file);
-              }, 
-              self.error); 
-          },
-          this.error
-        );          
+          window.resolveLocalFileSystemURL(imagePath, 
+            function(fileEntry){
+                //alert("got image file entry: " + fileEntry.fullPath);
+                //self.filename = fileEntry.fullPath.replace("/", "");
+                fileEntry.file(function(file){ //should return a raw HTML File Object
+                  let reader = new FileReader();
+                      reader.onloadend = function(e) {
+                      let imgBlob = new Blob([ this.result ], { type: "image/jpeg" } );
+                      self.file = imgBlob;
+                  };
+                  reader.readAsArrayBuffer(file); // or the way you want to read it
+                  console.log('dari kamera: ', file);
+                  self.$f7.preloader.hide();
+                }, 
+                self.error); 
+            },
+            this.error
+          );
+        } else if (this.type == 'ktp') {
+          console.log('ktp');
+          this.$f7.preloader.show();
+          this.imagePreview2 = imagePath;
+          this.showPreview2 = true;
+
+          window.resolveLocalFileSystemURL(imagePath, 
+            function(fileEntry){
+                //alert("got image file entry: " + fileEntry.fullPath);
+                //self.filename = fileEntry.fullPath.replace("/", "");
+                fileEntry.file(function(file){ //should return a raw HTML File Object
+                  let reader = new FileReader();
+                      reader.onloadend = function(e) {
+                      let imgBlob = new Blob([ this.result ], { type: "image/jpeg" } );
+                      self.file2 = imgBlob;
+                  };
+                  reader.readAsArrayBuffer(file); // or the way you want to read it
+                  console.log('dari kamera: ', file);
+                  self.$f7.preloader.hide();
+                }, 
+                self.error); 
+            },
+            this.error
+          );
+        } else if (this.type == 'kk') {
+          console.log('kk');
+          this.$f7.preloader.show();
+          this.imagePreview3 = imagePath;
+          this.showPreview3 = true;
+
+          window.resolveLocalFileSystemURL(imagePath, 
+            function(fileEntry){
+                //alert("got image file entry: " + fileEntry.fullPath);
+                //self.filename = fileEntry.fullPath.replace("/", "");
+                fileEntry.file(function(file){ //should return a raw HTML File Object
+                  let reader = new FileReader();
+                      reader.onloadend = function(e) {
+                      let imgBlob = new Blob([ this.result ], { type: "image/jpeg" } );
+                      self.file3 = imgBlob;
+                  };
+                  reader.readAsArrayBuffer(file); // or the way you want to read it
+                  console.log('dari kamera: ', file);
+                  self.$f7.preloader.hide();
+                }, 
+                self.error); 
+            },
+            this.error
+          );
+        } else {
+          console.log('else');
+          
+        }
       },
       error(err){
-        if(navigator.notification){
-            navigator.notification.alert(err, this.default, "Error!");
-            this.$f7.dialog.close();
-          }else{
-              self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
-              this.$f7.dialog.close();
-            }
+        self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
+        this.$f7.dialog.close();
       },
       async submitForm() {
             try {
-              if (document.getElementById('form').checkValidity() == false) {
+              if (document.getElementById('form').checkValidity() == false || this.file == '' || this.file2 == '' || this.file3 == '') {
                 this.$f7.dialog.alert('Lengkapi pengisan form', 'Terjadi Kesalahan');
               } else {
                 let formData = new FormData();
@@ -488,7 +571,10 @@ import axios from '../config/axiosConfig';
           }
         }
       }
-    }
+    },
+    beforeDestroy () {
+        document.removeEventListener("backbutton", this.navigateBack);
+    },
   }
 </script>
 <style scoped>

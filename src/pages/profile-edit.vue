@@ -15,10 +15,10 @@
             <f7-actions ref="actionsOneGroup">
               <f7-actions-group>
                 <f7-actions-label bold>Unggah Foto</f7-actions-label>
-                <f7-actions-button bold v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
-                <f7-actions-button bold v-else @click="openGalleryWeb"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
-                <f7-actions-button bold @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
-                <f7-actions-button bold color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
+                <f7-actions-button v-if="camera" @click="openGallery"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                <f7-actions-button v-else @click="openGalleryWeb"><f7-icon material="collections"></f7-icon>Galeri</f7-actions-button>
+                <f7-actions-button @click="takePicture"><f7-icon material="camera_alt"></f7-icon>Kamera</f7-actions-button>
+                <f7-actions-button color="red"><f7-icon material="cancel"></f7-icon>Cancel</f7-actions-button>
               </f7-actions-group>
             </f7-actions>
             <input style="display: none;" id="file-input" type="file" ref="file" accept="image/*" v-on:change="handleFileUpload()" required validate />
@@ -83,7 +83,9 @@
                 name="tgl"
                 type="date"
                 placeholder="-Pilih-"
+                v-model="tgl"
                 :value="tgl"
+                @input="tgl = $event.target.value"
                 required
                 validate
             >
@@ -139,6 +141,8 @@ export default {
     },
     async created() {
         try {
+            // Listen to Cordova's backbutton event
+            document.addEventListener('backbutton', this.navigateBack , false);
             let baseURL = await axios().request();
             this.baseURL = baseURL.config.baseURL;
             this.$f7.preloader.show();
@@ -166,6 +170,19 @@ export default {
         }
     },
     methods: {
+        navigateBack() {
+            let app = this.$f7;
+            let $$ = this.$$;
+            // Use Framework7's router to navigate back
+            let mainView = app.views.main;          
+            if (app.views.main.router.url == '/home/tab1') {
+                navigator.app.exitApp();
+            } else {
+                mainView.router.back('', {
+                force: true
+                });
+            }
+        },
         default(){
         console.log('defaultCallback');
         
@@ -218,13 +235,19 @@ export default {
                 //alert("got image file entry: " + fileEntry.fullPath);
                 //self.filename = fileEntry.fullPath.replace("/", "");
                 fileEntry.file(function(file){ //should return a raw HTML File Object
+                    let reader = new FileReader();
+                        reader.onloadend = function(e) {
+                        let imgBlob = new Blob([ this.result ], { type: "image/jpeg" } );
+                        self.file = imgBlob;
+                    };
+                    reader.readAsArrayBuffer(file); // or the way you want to read it
                     console.log('dari kamera: ', file);
-                    
+                    self.$f7.preloader.hide();
                 }, 
                 self.error); 
             },
             this.error
-            );          
+            );           
         },
         error(err){
             if(navigator.notification){
@@ -319,7 +342,10 @@ export default {
                 this.error = "Konfirmasi Password harus diisi"
             }
         }
-    }
+    },
+    beforeDestroy () {
+        document.removeEventListener("backbutton", this.navigateBack);
+    },
 }
 </script>
 <style scoped>

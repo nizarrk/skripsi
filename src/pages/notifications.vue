@@ -1,17 +1,70 @@
 <template>
   <f7-page>
     <f7-navbar title="Notifikasi"></f7-navbar>
-<f7-list media-list>
+    <div class="list media-list">
+  <ul>
+    <li v-for="(item, index) in items" :key="index" :style="item.status_notifikasi == 'Aktif' ? 'background-color:#E5E9F2' : ''">
+      <a v-if="item.tipe_notifikasi == 'Komentar'" :href="'/comments/'+item.id_lapor" class="item-link item-content" @click="updateStatus(item.id_notifikasi)">
+        <div class="item-inner">
+          <div class="item-title-row">
+            <div class="item-title"><b>{{item.tipe_notifikasi}}</b></div>
+            <div class="item-after">{{timeDifference(item.tgl_notifikasi)}}</div>
+          </div>
+          <div class="item-subtitle">Komentar baru dari <b>{{item.nama_user_notifikator}}</b></div>
+          <div class="item-text">{{item.desk_notifikasi}}</div>
+        </div>
+      </a>
+      <a v-else-if="item.tipe_notifikasi == 'Laporan Keluhan'" :href="'/report-detail/'+item.id_lapor" class="item-link item-content" @click="updateStatus(item.id_notifikasi)">
+        <div class="item-inner">
+          <div class="item-title-row">
+            <div class="item-title"><b>{{item.tipe_notifikasi}}</b></div>
+            <div class="item-after">{{timeDifference(item.tgl_notifikasi)}}</div>
+          </div>
+          <div class="item-subtitle">Pemberitahuan baru dari <b>{{item.nama_user_notifikator}}</b></div>
+          <div class="item-text">{{item.desk_notifikasi}}</div>
+        </div>
+      </a>
+      <a v-else-if="item.tipe_notifikasi == 'Izin Penggunaan Jalan'" :href="'/izin-list/'" class="item-link item-content" @click="updateStatus(item.id_notifikasi)">
+        <div class="item-inner">
+          <div class="item-title-row">
+            <div class="item-title"><b>{{item.tipe_notifikasi}}</b></div>
+            <div class="item-after">{{timeDifference(item.tgl_notifikasi)}}</div>
+          </div>
+          <div class="item-subtitle">Pemberitahuan baru dari <b>{{item.nama_user_notifikator}}</b></div>
+          <div class="item-text">{{item.desk_notifikasi}}</div>
+        </div>
+      </a>
+    </li>
+  </ul>
+</div>
+<!-- <f7-list media-list>
   <f7-list-item
     v-for="(item, index) in items"
     :key="index"
+    v-if="item.tipe_notifikasi == 'Komentar'"
     :link="'/comments/'+item.id_lapor"
     :title="item.tipe_notifikasi"
     :after="timeDifference(item.tgl_notifikasi)"
     :subtitle="'Komentar baru dari ' + item.nama_user_notifikator"
     :text="item.desk_notifikasi"
   ></f7-list-item>
-</f7-list>
+  <f7-list-item
+    v-else-if="item.tipe_notifikasi == 'Laporan Keluhan'"
+    :link="'/report-detail/'+item.id_lapor"
+    :title="item.tipe_notifikasi"
+    :after="timeDifference(item.tgl_notifikasi)"
+    :subtitle="'Pemberitahuan baru dari ' + item.nama_user_notifikator"
+    :text="item.desk_notifikasi"
+  ></f7-list-item>
+  <f7-list-item
+    v-else-if="item.tipe_notifikasi == 'Izin Penggunaan Jalan'"
+    :link="'/izin-list/'"
+    :title="item.tipe_notifikasi"
+    :after="timeDifference(item.tgl_notifikasi)"
+    :subtitle="'Pemberitahuan baru dari ' + item.nama_user_notifikator"
+    :text="item.desk_notifikasi"
+  ></f7-list-item>
+</f7-list> -->
   </f7-page>
 </template>
 
@@ -23,7 +76,9 @@ export default {
   data() {
     return {
       baseURL: '',
-      items: []
+      items: [],
+      link: '',
+      subtitle: '',
     }
   },
   async created() {
@@ -38,6 +93,13 @@ export default {
     } catch (error) {
       console.log(error.message);
       
+    }
+  },
+  methods: {
+    async updateStatus(id) {
+      await axios().put('/notif/' + id, {
+        status: 'Tidak Aktif'
+      });
     }
   },
   mixins: [date]

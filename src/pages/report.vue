@@ -184,8 +184,24 @@ var geocodeService = geocoding.geocodeService();
         camera: navigator.camera
       }
     },
-
+    created() {
+      // Listen to Cordova's backbutton event
+      document.addEventListener('backbutton', this.navigateBack , false);
+    },
     methods: {
+      navigateBack() {
+        let app = this.$f7;
+        let $$ = this.$$;
+        // Use Framework7's router to navigate back
+        let mainView = app.views.main;          
+        if (app.views.main.router.url == '/home/tab1') {
+            navigator.app.exitApp();
+        } else {
+            mainView.router.back('', {
+              force: true
+            });
+        }
+      },
       default(){
         console.log('defaultCallback');
         
@@ -216,9 +232,7 @@ var geocodeService = geocoding.geocodeService();
             sourceType: Camera.PictureSourceType.CAMERA,
             mediaType: Camera.MediaType.PICTURE,
             encodingType: Camera.EncodingType.JPEG,
-            cameraDirection: Camera.Direction.BACK,
-            targetWidth: 300,
-            targetHeight: 400
+            cameraDirection: Camera.Direction.BACK
           });
         }else{
           // If the navigator.camera is not available display generic error to the user.
@@ -233,14 +247,31 @@ var geocodeService = geocoding.geocodeService();
         this.imagePreview = imagePath;
         this.showPreview = false;
 
-        console.log(imagePath);
-        
+        console.log(imagePath)
+        // var options = new FileUploadOptions();
+        //     options.fileKey = "fotoLapor";
+        //     options.fileName = imagePath.substr(imagePath.lastIndexOf('/') + 1);
+        //     options.mimeType = "image/jpeg";
+        //     var ft = new FileTransfer();
+        //     ft.upload(imagePath, "http://192.168.1.12:3000/lapor",
+        //     function (result) {
+        //         console.log(JSON.stringify(result));
+        //     }, 
+        //     self.error, 
+        //     options
+        //     )
 
         window.resolveLocalFileSystemURL(imagePath, 
           function(fileEntry){
               //alert("got image file entry: " + fileEntry.fullPath);
               //self.filename = fileEntry.fullPath.replace("/", "");
               fileEntry.file(function(file){ //should return a raw HTML File Object
+                let reader = new FileReader();
+                    reader.onloadend = function(e) {
+                    let imgBlob = new Blob([ this.result ], { type: "image/jpeg" } );
+                    self.file = imgBlob;
+                };
+                reader.readAsArrayBuffer(file); // or the way you want to read it
                 console.log('dari kamera: ', file);
                 self.getLocation(file);
               }, 
@@ -250,13 +281,9 @@ var geocodeService = geocoding.geocodeService();
         );          
       },
       error(err){
-        if(navigator.notification){
-            navigator.notification.alert(err, this.default, "Error!");
-            this.$f7.dialog.close();
-          }else{
-              self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
-              this.$f7.dialog.close();
-            }
+        self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
+        this.$f7.dialog.close();
+            
       },
       /*Submits the file to the server*/
       submitFile(){
@@ -265,6 +292,8 @@ var geocodeService = geocoding.geocodeService();
         if (this.kat == '' || this.file == '' || this.desk == '' || this.address == null) {
           self.$f7.dialog.alert('Pengisian laporan keluhan tidak lengkap', 'Terjadi Kesalahan');
         } else {
+          console.log(this.file);
+          
           /*Initialize the form data*/
           let formData = new FormData();
 
@@ -345,6 +374,7 @@ var geocodeService = geocoding.geocodeService();
             console.log(response.data);
             if (response.data.status == 200) {
               self.err = false;
+              self.showPreview = true;
               self.lat = response.data.values[0].originLat;
               self.lng = response.data.values[0].originLng;
 
@@ -421,8 +451,11 @@ var geocodeService = geocoding.geocodeService();
         // Open it
         this.toastBottom.open();
       }
-    }
-  }
+    },
+    beforeDestroy () {
+    document.removeEventListener("backbutton", this.navigateBack);
+  },
+}
 </script>
 <style scoped>
 .image-upload>input {

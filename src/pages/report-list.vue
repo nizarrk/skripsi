@@ -14,10 +14,10 @@
             :style="{ backgroundImage: 'url(' + baseURL + item.foto_lapor + ')' }"
           ><span><f7-icon md="material:place"></f7-icon>{{item.lokasi_lapor}}</span></f7-card-header>
           </a>
-          <!-- background-image:url -->
           <f7-card-content>
             <p class="date">{{formatTgl(item.tgl_lapor)}}</p>
             <p>{{item.desk_lapor}}</p>
+            <small style="color:red" v-show="item.status_lapor == 'Ditolak'">*{{item.pesan_tolak_lapor}}</small>
           </f7-card-content>
           <f7-card-footer>
             <f7-chip v-if="item.status_lapor == 'Menunggu'" :text="item.status_lapor" color="yellow"></f7-chip>
@@ -44,6 +44,8 @@ export default {
   },
   async created() {
     try {
+      // Listen to Cordova's backbutton event
+      document.addEventListener('backbutton', this.navigateBack , false);
       let baseURL = await axios().request();
       this.baseURL = baseURL.config.baseURL;
       this.$f7.preloader.show();
@@ -58,6 +60,19 @@ export default {
     }
   },
   methods: {
+    navigateBack() {
+      let app = this.$f7;
+      let $$ = this.$$;
+      // Use Framework7's router to navigate back
+      let mainView = app.views.main;          
+      if (app.views.main.router.url == '/home/tab1') {
+          navigator.app.exitApp();
+      } else {
+          mainView.router.back('', {
+            force: true
+          });
+      }
+    },
     async pullToRefresh(event, done) {
         let self = this;
 
@@ -68,6 +83,9 @@ export default {
           done();
         }, 1000);
       }
+  },
+  beforeDestroy () {
+    document.removeEventListener("backbutton", this.navigateBack);
   },
   mixins: [date]
 }

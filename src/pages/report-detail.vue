@@ -48,20 +48,35 @@
             :photos="[photo]"
             ref="standalone"
           ></f7-photo-browser>
-            <p>{{items.desk_lapor}}</p><img ref="fotolapor" :src="baseURL + items.foto_lapor" width="100%" raised @click="$refs.standalone.open()"/>
-            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Angkutan Umum'"><f7-icon material="directions_bus" size="15px"></f7-icon><span>Angkutan Umum</span></span>
-            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Lalu Lintas'"><f7-icon material="traffic" size="15px"></f7-icon><span>Lalu Lintas</span></span>
-            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Perparkiran'"><f7-icon material="local_parking" size="15px"></f7-icon><span>Perparkiran</span></span>
-            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Infrastruktur'"><f7-icon material="language" size="15px"></f7-icon><span>Infrastruktur</span></span>
-            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Pengendalian Operasi'"><f7-icon material="directions_walk" size="15px"></f7-icon><span>Pengendalian Operasi</span></span>
-            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Layanan'"><f7-icon material="people" size="15px"></f7-icon><span>Layanan</span></span>
-            <p class="likes">Likes: {{items.total_vote}} &nbsp;&nbsp; Comments: {{items.total_komentar}}</p>
+            <p>{{items.desk_lapor}}</p>
+            <img ref="fotolapor" :src="baseURL + items.foto_lapor" width="100%" raised @click="$refs.standalone.open()"/>
+            <div class="text-block">
+              <span style="font-size: 13px;"><f7-icon md="material:place" size="15px"></f7-icon>{{items.lokasi_lapor}}</span>
+            </div>
+            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Angkutan Umum'"><f7-icon material="directions_bus" size="15px"></f7-icon><span> Angkutan Umum</span></span>
+            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Lalu Lintas'"><f7-icon material="traffic" size="15px"></f7-icon><span> Lalu Lintas</span></span>
+            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Perparkiran'"><f7-icon material="local_parking" size="15px"></f7-icon><span> Perparkiran</span></span>
+            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Infrastruktur'"><f7-icon material="language" size="15px"></f7-icon><span> Infrastruktur</span></span>
+            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Pengendalian Operasi'"><f7-icon material="directions_walk" size="15px"></f7-icon><span> Pengendalian Operasi</span></span>
+            <span style="color: #8e8e93" v-show="items.kat_lapor == 'Layanan'"><f7-icon material="people" size="15px"></f7-icon><span> Layanan</span></span><br>
+             <small style="color:red" v-show="items.status_lapor == 'Ditolak'">*{{items.pesan_tolak_lapor}}</small>
+            <f7-row>
+            <f7-col width="70">
+              <p class="likes">Vote: {{items.total_vote}} &nbsp;&nbsp; Komentar: {{items.total_komentar}}</p>
+            </f7-col>
+            <f7-col width="30">
+              <f7-chip v-if="items.status_lapor == 'Menunggu'" :text="items.status_lapor" color="yellow"></f7-chip>
+              <f7-chip style="left: 25px;" v-else-if="items.status_lapor == 'Proses'" :text="items.status_lapor" color="blue"></f7-chip>
+              <f7-chip style="left: 25px;" v-else-if="items.status_lapor == 'Selesai'" :text="items.status_lapor" color="green"></f7-chip>
+              <f7-chip style="left: 25px;"  v-else :text="items.status_lapor" color="red"></f7-chip>
+            </f7-col>
+          </f7-row>
         </f7-card-content>
         <f7-card-footer class="no-border">
-            <f7-link v-if="items.pernah_vote == 1" style="color: #2999F3" @click="deleteVote(items.id_vote)"><f7-icon material="thumb_up" size="20px"></f7-icon> Like</f7-link>
-            <f7-link v-else @click="vote(items.id_lapor)"><f7-icon material="thumb_up" size="20px"></f7-icon> Like</f7-link>
-            <f7-link :href="'/comments/' + items.id_lapor"><f7-icon material="comment" size="20px"></f7-icon> Comment</f7-link>
-            <f7-link><f7-icon material="share" size="20px"></f7-icon> Share</f7-link>
+          <f7-link v-if="items.pernah_vote == 1" style="color: #2999F3" @click="deleteVote(items.id_vote)"><f7-icon material="thumb_up" size="20px"></f7-icon> Like</f7-link>
+          <f7-link v-else @click="vote(items.id_lapor)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
+          <f7-link :href="'/comments/' + items.id_lapor"><f7-icon material="comment" size="20px"></f7-icon> Komentar</f7-link>
+          <f7-link><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
         </f7-card-footer>
       </f7-card>
       <f7-block-title>Lokasi</f7-block-title>
@@ -70,12 +85,11 @@
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
           <l-marker id="marker"
           v-show="address" 
-          :lat-lng="marker" 
-          @click="removeMarker()">
+          :lat-lng="marker"
+          >
             <l-popup>{{items.lokasi_lapor}}</l-popup>
           </l-marker>
         </l-map>
-        <p style="color: #8e8e93"><f7-icon md="material:place"></f7-icon>{{items.lokasi_lapor}}</p>
       </f7-block>
       <f7-block-title>Komentar</f7-block-title>
         <f7-block>
@@ -132,6 +146,8 @@ export default {
   },
   async created() {
     try {
+      // Listen to Cordova's backbutton event
+      document.addEventListener('backbutton', this.navigateBack , false);
       let baseURL = await axios().request();
       this.baseURL = baseURL.config.baseURL;
       let decode = this.$jwt.decode(localStorage.getItem('token'));
@@ -153,6 +169,19 @@ export default {
     }
   },
   methods: {
+    navigateBack() {
+      let app = this.$f7;
+      let $$ = this.$$;
+      // Use Framework7's router to navigate back
+      let mainView = app.views.main;          
+      if (app.views.main.router.url == '/home/tab1') {
+          navigator.app.exitApp();
+      } else {
+          mainView.router.back('', {
+            force: true
+          });
+      }
+    },
     async editForm() {
       try {
         if (document.getElementById('form').checkValidity() == false) {
@@ -207,6 +236,9 @@ export default {
       }
     }
   },
+  beforeDestroy () {
+    document.removeEventListener("backbutton", this.navigateBack);
+  },
   mixins: [date]
 }
 </script>
@@ -251,5 +283,17 @@ export default {
 <style>
 .leaflet-popup-close-button {
   display: none;
+}
+
+.text-block {
+  z-index: 999;
+  position: absolute;
+  bottom: 85px;
+  left: 10px;
+  margin-right: 10px;
+  width: 94%;
+  color: white;
+  background: rgba(0, 0, 0, 0.65);
+
 }
 </style>

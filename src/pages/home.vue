@@ -27,21 +27,34 @@
         <p>{{item.desk_lapor}}</p>
         <a :href="'/report-detail/' + item.id_lapor">
         <img :src="baseURL + item.foto_lapor" style="width: 100%; height: 300px; object-fit: cover;"/>
+        <div class="text-block">
+          <span style="font-size: 13px;"><f7-icon md="material:place" size="15px"></f7-icon>{{item.lokasi_lapor}}</span>
+        </div>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Angkutan Umum'"><f7-icon material="directions_bus" size="15px"></f7-icon><span> Angkutan Umum</span></span>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Lalu Lintas'"><f7-icon material="traffic" size="15px"></f7-icon><span> Lalu Lintas</span></span>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Perparkiran'"><f7-icon material="local_parking" size="15px"></f7-icon><span> Perparkiran</span></span>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Infrastruktur'"><f7-icon material="language" size="15px"></f7-icon><span> Infrastruktur</span></span>
         <span style="color: #8e8e93" v-show="item.kat_lapor == 'Pengendalian Operasi'"><f7-icon material="directions_walk" size="15px"></f7-icon><span> Pengendalian Operasi</span></span>
-        <span style="color: #8e8e93" v-show="item.kat_lapor == 'Layanan'"><f7-icon material="people" size="15px"></f7-icon><span> Layanan</span></span>
-        <p class="likes"><f7-icon md="material:place" size="15px"></f7-icon>{{item.lokasi_lapor}}</p>
-        <p class="likes">Likes: {{item.total_vote}} &nbsp;&nbsp; Comments: {{item.total_komentar}}</p>
+        <span style="color: #8e8e93" v-show="item.kat_lapor == 'Layanan'"><f7-icon material="people" size="15px"></f7-icon><span> Layanan</span></span><br>
+        
+        <f7-row>
+        <f7-col width="70">
+          <p class="likes">Vote: {{item.total_vote}} &nbsp;&nbsp; Komentar: {{item.total_komentar}}</p>
+        </f7-col>
+        <f7-col width="30">
+          <f7-chip v-if="item.status_lapor == 'Menunggu'" :text="item.status_lapor" color="yellow"></f7-chip>
+          <f7-chip style="left: 25px;" v-else-if="item.status_lapor == 'Proses'" :text="item.status_lapor" color="blue"></f7-chip>
+          <f7-chip style="left: 25px;" v-else-if="item.status_lapor == 'Selesai'" :text="item.status_lapor" color="green"></f7-chip>
+          <f7-chip  v-else :text="item.status_lapor" color="red"></f7-chip>
+        </f7-col>
+      </f7-row>
         </a>
       </f7-card-content>
       <f7-card-footer class="no-border">
         <f7-link v-if="item.pernah_vote == 1" style="color: #2999F3" @click="deleteVote(item.id_vote)"><f7-icon material="thumb_up" size="20px"></f7-icon> Like</f7-link>
-        <f7-link v-else @click="vote(item.id_lapor)"><f7-icon material="thumb_up" size="20px"></f7-icon> Like</f7-link>
-        <f7-link :href="'/comments/' + item.id_lapor"><f7-icon material="comment" size="20px"></f7-icon> Comment</f7-link>
-        <f7-link><f7-icon material="share" size="20px"></f7-icon> Share</f7-link>
+        <f7-link v-else @click="vote(item.id_lapor)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
+        <f7-link :href="'/comments/' + item.id_lapor"><f7-icon material="comment" size="20px"></f7-icon> Komentar</f7-link>
+        <f7-link><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
       </f7-card-footer>
     </f7-card>
   </f7-page>
@@ -56,11 +69,15 @@ export default {
       return {
         baseURL: '',
         items: [],
-        state: ''
+        state: '',
+        lastTimeBackPress: 0,
+        timePeriodToExit: 2000
       };
     },
     async created() {
       try {
+        // Listen to Cordova's backbutton event
+        document.addEventListener('backbutton', this.navigateBack , false);
         this.$f7.preloader.show();
         let baseURL = await axios().request();
         this.baseURL = baseURL.config.baseURL;
@@ -77,6 +94,24 @@ export default {
       }
     },
     methods: {
+      navigateBack(e) {
+        var lastTimeBackPress = 0;
+        var timePeriodToExit = 2000;
+
+        if (new Date().getTime() - this.lastTimeBackPress < this.timePeriodToExit) {
+          navigator.app.exitApp();
+        } else {
+          this.toastBottom = this.$f7.toast.create({
+            text: 'Tekan sekali lagi untuk keluar',
+            closeTimeout: 2000,
+          });
+        
+          // Open it
+          this.toastBottom.open();
+
+          this.lastTimeBackPress = new Date().getTime();
+        }
+      },
       async pullToRefresh(event, done) {
         let self = this;
 
@@ -155,6 +190,18 @@ export default {
 }
 .demo-facebook-card .card-content-padding .likes {
   color: #8e8e93;
+}
+
+.text-block {
+  z-index: 999;
+  position: absolute;
+  bottom: 85px;
+  left: 10px;
+  margin-right: 10px;
+  width: 94%;
+  color: white;
+  background: rgba(0, 0, 0, 0.65);
+
 }
 </style>
 

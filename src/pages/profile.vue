@@ -35,6 +35,10 @@
                       <span style="font-size:18px;">{{items.selesai}}</span><br>
                       <span style="font-size:16px;"> Selesai</span>
                     </f7-col>
+                    <f7-col>
+                      <span style="font-size:18px;">{{items.ditolak}}</span><br>
+                      <span style="font-size:16px;"> Ditolak</span>
+                    </f7-col>
                   </f7-row>
         </f7-block>
         <f7-block>
@@ -45,7 +49,7 @@
             <f7-list-item link="/izin-list/" title="Izin Penggunaan Jalan" :badge="items.total_izin">
               <f7-icon slot="media" md="material:note_add"></f7-icon>
             </f7-list-item>
-            <f7-list-item link="/survey/" title="Survey Kepuasan">
+            <f7-list-item v-show="items.total_survey == 0" link="/survey/" title="Survey Kepuasan">
               <f7-icon slot="media" md="material:assignment"></f7-icon>
             </f7-list-item>
             <f7-list-item link="/kritik-saran/" title="Kritik dan Saran">
@@ -73,7 +77,7 @@ export default {
         this.$f7.preloader.show();
         let result = await axios().get('/user/profile');
         this.$f7.preloader.hide();
-        //console.log(result.data.values);
+        console.log(result.data.values);
 
         this.items = result.data.values[0];
         console.log(result.data);

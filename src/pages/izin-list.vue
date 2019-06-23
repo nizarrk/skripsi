@@ -55,6 +55,8 @@ export default {
   },
   async created() {
     try {
+      // Listen to Cordova's backbutton event
+      document.addEventListener('backbutton', this.navigateBack , false);
       let baseURL = await axios().request();
       this.baseURL = baseURL.config.baseURL;
       this.$f7.preloader.show();
@@ -69,6 +71,19 @@ export default {
     }
   },
   methods: {
+    navigateBack() {
+      let app = this.$f7;
+      let $$ = this.$$;
+      // Use Framework7's router to navigate back
+      let mainView = app.views.main;          
+      if (app.views.main.router.url == '/home/tab1') {
+          navigator.app.exitApp();
+      } else {
+          mainView.router.back('', {
+          force: true
+          });
+      }
+    },
     async openPhoto(id){
       let newarr = [];
       console.log('atas');
@@ -108,6 +123,9 @@ export default {
           done();
         }, 1000);
       }
+  },
+  beforeDestroy () {
+    document.removeEventListener("backbutton", this.navigateBack);
   },
   mixins: [date]
 }

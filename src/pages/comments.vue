@@ -60,7 +60,7 @@ export default {
 
       // notifikasi
       user: '',
-      komen: null,
+      idkomen: null,
       userlapor: '',
       kodelapor: '',
       idlapor: ''
@@ -90,7 +90,7 @@ export default {
           this.showToast('Komentar kosong');
           
         } else {
-          if (this.komen == null) {
+          if (this.idkomen == null) {
             console.log('post');
             
             let comment = await axios().post('/komentar', {
@@ -117,13 +117,13 @@ export default {
             
             let update = await axios().put('/komentar', {
               desk: this.msg,
-              id: this.komen
+              id: this.idkomen
             });
             this.state = 'put';
             this.showToast('Komentar diubah');
 
             this.msg = '';
-            this.komen = null;
+            this.idkomen = null;
 
             console.log(update.data);
           }
@@ -137,7 +137,7 @@ export default {
       try {
         if (user == this.user) {
           this.$f7.popover.open(document.getElementById('popover'), document.getElementById(id), true);
-          this.komen = id;
+          this.idkomen = id;
         }
         
       } catch (error) {
@@ -147,7 +147,7 @@ export default {
     },
     async editComment() {
       try {
-        let getid = await axios().get('/komentar/getid/' + this.komen);
+        let getid = await axios().get('/komentar/getid/' + this.idkomen);
         console.log(getid.data);
         this.msg = getid.data.values[0].desk_komentar;  
 
@@ -157,13 +157,13 @@ export default {
     },
     async deleteComment() {
       try {
-        await axios().delete('/komentar/' + this.komen);
+        await axios().delete('/komentar/' + this.idkomen);
         this.state = 'delete';
         
         this.showToast('Komentar dihapus');
 
         this.msg = '';
-        this.komen = null;
+        this.idkomen = null;
       } catch (error) {
         this.showToast(error.message);
         

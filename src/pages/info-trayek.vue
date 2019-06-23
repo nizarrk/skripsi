@@ -1,13 +1,12 @@
 <template>
     <f7-page>
-      <f7-navbar title="Trayek" back-link="Back">
+      <f7-navbar :title="nama" back-link="Back">
         <f7-nav-right>
-          <f7-link icon-ios="f7:save" icon-md="material:check" @click="submitFile"></f7-link>
         </f7-nav-right>
       </f7-navbar>
-        <l-map style="height: 100%;" id="map" ref="myMap" :zoom="zoom" :center="center"  @click="addMarker">
+        <l-map style="height: 100%;" id="map" ref="myMap" :zoom="zoom" :center="center">
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-          <l-polyline @click="removeMarker"
+          <l-polyline
           :lat-lngs="polyline.latlngs"
           :color="polyline.color">
           </l-polyline>
@@ -41,12 +40,14 @@ export default {
           latlngs: [],
           color: 'blue'
         },
-        items: []
+        items: [],
+        nama: ''
     }
   },
   async created() {
     try {
       let result = await axios().get('/info/trayek/' + this.id);
+      this.nama = result.data.values[0].nama_trayek;
       console.log(JSON.parse(result.data.values[0].latlng_trayek));
       this.polyline.latlngs = JSON.parse(result.data.values[0].latlng_trayek);
       
@@ -54,36 +55,6 @@ export default {
       
     }
   },
-  methods:{
-    removeMarker(index) {
-      this.polyline.latlngs.splice(index, 1);
-    },
-    addMarker(event) {
-      this.polyline.latlngs.push(event.latlng);
-      console.log(JSON.stringify(this.polyline.latlngs));
-      
-    },
-    /*Submits the file to the server*/
-      submitFile(){
-        let self = this;       
-
-        /*Make the request to the POST /single-file URL*/
-        axios().post('/info/trayek/', {
-          nama: 'Line A',
-          rute: 'wakeh',
-          latlng: this.polyline.latlngs
-        })
-        .then(function(response){
-          console.log('SUCCESS!!', response);
-          self.$f7.dialog.alert(response.statusText, 'Berhasil'); 
-          // self.$f7router.navigate('/home/');
-          })
-        .catch(function(error){
-          console.log('FAILURE!!', error.message);
-          self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');
-        });
-      },
-  }
     // mounted () {
     //   this.$nextTick(() => {
     //     this.$refs.myMap.mapObject.ANY_LEAFLET_MAP_METHOD();

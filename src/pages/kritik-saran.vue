@@ -64,7 +64,24 @@ export default {
       desk: ''
     }
   },
+  created() {
+    // Listen to Cordova's backbutton event
+    document.addEventListener('backbutton', this.navigateBack , false);
+  },
   methods: {
+    navigateBack() {
+      let app = this.$f7;
+      let $$ = this.$$;
+      // Use Framework7's router to navigate back
+      let mainView = app.views.main;          
+      if (app.views.main.router.url == '/home/tab1') {
+        navigator.app.exitApp();
+      } else {
+        mainView.router.back('', {
+            force: true
+        });
+      }
+    },
     async submitForm() {
       try {
         if (this.rate =='' || this.desk == '') {
@@ -98,7 +115,10 @@ export default {
           
       }
     },
-  }
+  },
+  beforeDestroy () {
+    document.removeEventListener("backbutton", this.navigateBack);
+  },
 }
 </script>
 <style scoped>

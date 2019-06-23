@@ -22,7 +22,7 @@
               <p>{{item.desk_info | limitToDisplay(item.desk_info)}}</p>
             </f7-card-content>
             <f7-card-footer>
-              <f7-link>Read more</f7-link>
+              <f7-link @click="getInfoDetails(item.id_info)" fill popup-open=".demo-popup">Baca Selengkapnya</f7-link>
             </f7-card-footer>
           </f7-card>
         </f7-block>
@@ -44,6 +44,21 @@
         </f7-block>
       </f7-tab>
     </f7-tabs>
+    <f7-popup class="demo-popup" :opened="popupOpened" @popup:closed="popupOpened = false">
+      <f7-page>
+        <f7-navbar title="Detail Info">
+          <f7-nav-right>
+            <f7-link popup-close icon-md="material:close"></f7-link>
+          </f7-nav-right>
+        </f7-navbar>
+        <f7-block>
+          <h2>{{infoDetail.judul_info}}</h2>
+          <span style="color: #8e8e93;">{{formatTgl(infoDetail.tgl_info)}} | Oleh: {{infoDetail.author_info}}</span>
+          <img :src="baseURL + infoDetail.foto_info" alt="" width="100%">
+          <p>{{infoDetail.desk_info}}</p>
+        </f7-block>
+      </f7-page>
+    </f7-popup>
   </f7-page>
 </template>
 <script>
@@ -55,7 +70,9 @@ import date from '../mixins/dateConfig';
       return {
         baseURL: '',
         info: [],
-        trayek: []
+        infoDetail: [],
+        trayek: [],
+        popupOpened: false,
       }
     },
     async created() {
@@ -63,7 +80,7 @@ import date from '../mixins/dateConfig';
         this.$f7.preloader.show();
         let baseURL = await axios().request();
         this.baseURL = baseURL.config.baseURL;
-        let info = await axios().get('/info');
+        let info = await axios().get('/info');;
         let trayek = await axios().get('/info/trayek');
 
         this.info = info.data.values;
@@ -76,8 +93,22 @@ import date from '../mixins/dateConfig';
 
         this.$f7.preloader.hide();
       } catch (error) {
-        
+        console.log(error.message);
+        this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
       }      
+    },
+    methods: {
+      async getInfoDetails(id) {
+        try {
+          let result = await axios().get('/info/' + id);
+          this.infoDetail = result.data.values[0];
+          console.log(this.infoDetail);
+          
+        } catch (error) {
+          console.log(error.message);
+          this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
+        }
+      }
     },
     filters: {
         limitToDisplay(text) {
