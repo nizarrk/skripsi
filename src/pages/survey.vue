@@ -119,7 +119,7 @@ export default {
                     
                     
                     this.$f7.preloader.hide();
-                    this.$f7.dialog.alert('OK', 'Berhasil'); 
+                    this.openToast('Berhasil mengisi data survey') 
                     this.$f7router.back('', {
                         force: true
                     });
@@ -130,6 +130,17 @@ export default {
                 this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
             }
         },
+        openToast(text) {
+            console.log(text);
+            
+            this.toastBottom = this.$f7.toast.create({
+                text: text,
+                closeTimeout: 3000,
+            });
+            
+            // Open it
+            this.toastBottom.open();
+        }
     },
     beforeDestroy () {
         document.removeEventListener("backbutton", this.navigateBack);

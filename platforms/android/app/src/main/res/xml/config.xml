@@ -18,7 +18,15 @@
     <feature name="Notification">
         <param name="android-package" value="org.apache.cordova.dialogs.Notification" />
     </feature>
-    <name>SKRIPSI!!!</name>
+    <feature name="WebShare">
+        <param name="android-package" value="by.chemerisuk.cordova.WebSharePlugin" />
+        <param name="onload" value="false" />
+    </feature>
+    <feature name="SplashScreen">
+        <param name="android-package" value="org.apache.cordova.splashscreen.SplashScreen" />
+        <param name="onload" value="true" />
+    </feature>
+    <name>E-Dishub</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
     </description>
@@ -34,5 +42,16 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
     <allow-intent href="market:*" />
+    <icon density="hdpi" src="assets/hdpi.png" />
+    <icon density="xhdpi" src="assets/xhdpi.png" />
+    <icon density="xxhdpi" src="assets/xxhdpi.png" />
+    <icon density="xxxhdpi" src="assets/xxxhdpi.png" />
     <preference name="loglevel" value="DEBUG" />
+    <preference name="SplashScreenDelay" value="2000" />
+    <preference name="AutoHideSplashScreen" value="true" />
+    <preference name="SplashScreen" value="splash" />
+    <preference name="ShowSplashScreenSpinner" value="false" />
+    <preference name="FadeSplashScreen" value="false" />
+    <preference name="SplashShowOnlyFirstTime" value="false" />
+    <preference name="SplashMaintainAspectRatio" value="true" />
 </widget>

@@ -322,7 +322,7 @@ export default {
                         if (user.data.status == 500) {
                             this.$f7.dialog.alert(user.data.values, 'Terjadi Kesalahan');
                         } else {
-                            this.$f7.dialog.alert(user.statusText, 'Berhasil'); 
+                            this.openToast('Berhasil mengubah data profil')
                             this.$f7router.back('/home/tab5/', {
                                 force: true
                             });
@@ -333,14 +333,16 @@ export default {
                     }
             }
         },
-        checkPass() {            
-            if (this.pass != this.confpass) {
-                this.errorforce = true;
-                this.error = "Password tidak sesuai"
-            } else {
-                this.errorforce = false;
-                this.error = "Konfirmasi Password harus diisi"
-            }
+        openToast(text) {
+            console.log(text);
+            
+            this.toastBottom = this.$f7.toast.create({
+                text: text,
+                closeTimeout: 3000,
+            });
+            
+            // Open it
+            this.toastBottom.open();
         }
     },
     beforeDestroy () {

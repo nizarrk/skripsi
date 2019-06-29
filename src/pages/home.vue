@@ -1,19 +1,19 @@
 <template>
   <f7-page ptr @ptr:refresh="pullToRefresh" :page-content="true">
     <f7-navbar>
+      <f7-nav-title>Beranda</f7-nav-title>
       <f7-nav-left>
-        <f7-link icon-ios="f7:menu" icon-md="material:menu" panel-open="left"></f7-link>
+        <!-- <img style="width: 120px; padding-left:10px;" src="../static/e-dishub.png" alt="logo"> -->
       </f7-nav-left>
-      <f7-nav-title>My App</f7-nav-title>
       <f7-nav-right>
-        <f7-link class="searchbar-enable" data-searchbar=".searchbar-demo" icon-ios="f7:search_strong" icon-md="material:search"></f7-link>
+        <!-- <f7-link class="searchbar-enable" data-searchbar=".searchbar-demo" icon-ios="f7:search_strong" icon-md="material:search"></f7-link> -->
       </f7-nav-right>
-      <f7-searchbar
+      <!-- <f7-searchbar
         class="searchbar-demo"
         expandable
         search-container=".search-list"
         search-in=".item-title"
-      ></f7-searchbar>
+      ></f7-searchbar> -->
     </f7-navbar>
     <f7-card class="demo-facebook-card" v-for="(item, index) in items" :key="index">
       <f7-card-header class="no-border" :laporid="item.id_lapor">
@@ -51,10 +51,10 @@
         </a>
       </f7-card-content>
       <f7-card-footer class="no-border">
-        <f7-link v-if="item.pernah_vote == 1" style="color: #2999F3" @click="deleteVote(item.id_vote)"><f7-icon material="thumb_up" size="20px"></f7-icon> Like</f7-link>
+        <f7-link v-if="item.pernah_vote == 1" style="color: #2999F3" @click="deleteVote(item.id_vote)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
         <f7-link v-else @click="vote(item.id_lapor)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
         <f7-link :href="'/comments/' + item.id_lapor"><f7-icon material="comment" size="20px"></f7-icon> Komentar</f7-link>
-        <f7-link><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
+        <f7-link @click="share"><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
       </f7-card-footer>
     </f7-card>
   </f7-page>
@@ -63,6 +63,7 @@
 import { setTimeout } from 'timers';
 import date from '../mixins/dateConfig';
 import axios from '../config/axiosConfig';
+import { alert } from '../../plugins/cordova-plugin-dialogs/www/browser/notification';
 
 export default {
     data() {
@@ -75,7 +76,7 @@ export default {
       };
     },
     async created() {
-      try {
+      try {        
         // Listen to Cordova's backbutton event
         document.addEventListener('backbutton', this.navigateBack , false);
         this.$f7.preloader.show();
@@ -90,26 +91,47 @@ export default {
         this.items = result.data.values;
       } catch (error) {
         console.log(error);
-        
+        this.$f7.preloader.hide();
+        this.$f7.dialog.alert("Terjadi kesalahan pada server", 'Terjadi Kesalahan');
+        localStorage.removeItem('token');
+        this.$f7router.navigate('/login/');
       }
     },
     methods: {
       navigateBack(e) {
-        var lastTimeBackPress = 0;
-        var timePeriodToExit = 2000;
+        let app = this.$f7;
+        // Use Framework7's router to navigate back
+        let mainView = app.views.main;
+        if (app.views.main.router.url == '/home/') {
+          if (new Date().getTime() - this.lastTimeBackPress < this.timePeriodToExit) {
+            navigator.app.exitApp();
+          } else {
+            this.toastBottom = this.$f7.toast.create({
+              text: 'Tekan sekali lagi untuk keluar',
+              closeTimeout: 2000,
+            });
+          
+            // Open it
+            this.toastBottom.open();
 
-        if (new Date().getTime() - this.lastTimeBackPress < this.timePeriodToExit) {
-          navigator.app.exitApp();
-        } else {
-          this.toastBottom = this.$f7.toast.create({
-            text: 'Tekan sekali lagi untuk keluar',
-            closeTimeout: 2000,
+            this.lastTimeBackPress = new Date().getTime();
+          }
+        }
+      },
+      share() {
+        if (navigator.share) {
+          navigator.share({
+              title: "Share topic",
+              text: "Share message",
+              url: "Share url"
+          }).then(() => {
+              console.log("Data was shared successfully");
+          }).catch((err) => {
+              console.error("Share failed:", err.message);
           });
-        
-          // Open it
-          this.toastBottom.open();
-
-          this.lastTimeBackPress = new Date().getTime();
+        } else {
+          alert('hai')
+          
         }
       },
       async pullToRefresh(event, done) {

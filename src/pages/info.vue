@@ -5,7 +5,6 @@
     <f7-toolbar tabbar top>
       <f7-link tab-link="#tab-1" tab-link-active style="text-transform: capitalize;">Berita</f7-link>
       <f7-link tab-link="#tab-2" style="text-transform: capitalize;">Trayek</f7-link>
-      <f7-link tab-link="#tab-3" style="text-transform: capitalize;">Parkir</f7-link>
     </f7-toolbar>
 
     <f7-tabs swipeable>
@@ -36,11 +35,6 @@
             </div>
             <div class="card-footer"><f7-link :href="'/info-trayek/' + item.id_trayek">Lihat Detail</f7-link></div>
           </div>
-        </f7-block>
-      </f7-tab>
-      <f7-tab id="tab-3" class="page-content">
-        <f7-block>
-          <center><span style="font-size: 17px; color: #8e8e93;">Tidak Ada Data.</span></center>
         </f7-block>
       </f7-tab>
     </f7-tabs>

@@ -162,6 +162,9 @@ var geocodeService = geocoding.geocodeService();
         address: null,
         district: null,
 
+        // user
+        idUser: '',
+
         //upload
         filename: '',
         file: '',
@@ -185,6 +188,8 @@ var geocodeService = geocoding.geocodeService();
       }
     },
     created() {
+      let decode = this.$jwt.decode();
+      this.idUser = decode.userId;
       // Listen to Cordova's backbutton event
       document.addEventListener('backbutton', this.navigateBack , false);
     },
@@ -286,44 +291,52 @@ var geocodeService = geocoding.geocodeService();
             
       },
       /*Submits the file to the server*/
-      submitFile(){
-        let self = this;
+      async submitFile() {
+        try {
+          let self = this;
 
-        if (this.kat == '' || this.file == '' || this.desk == '' || this.address == null) {
-          self.$f7.dialog.alert('Pengisian laporan keluhan tidak lengkap', 'Terjadi Kesalahan');
-        } else {
-          console.log(this.file);
-          
-          /*Initialize the form data*/
-          let formData = new FormData();
+          if (this.kat == '' || this.file == '' || this.desk == '' || this.address == null) {
+            self.$f7.dialog.alert('Pengisian laporan keluhan tidak lengkap', 'Terjadi Kesalahan');
+          } else {
+            console.log(this.file);
+            
+            /*Initialize the form data*/
+            let formData = new FormData();
 
-          /*Add the form data we need to submit*/
-          formData.append('kat', this.kat);
-          formData.append('fotoLapor', this.file);
-          formData.append('desk', this.desk);
-          formData.append('lat', this.lat);
-          formData.append('lng', this.lng);
-          formData.append('lokasi', this.address);
-          formData.append('district', this.district);
-          formData.append('status', this.err);
+            /*Add the form data we need to submit*/
+            formData.append('kat', this.kat);
+            formData.append('fotoLapor', this.file);
+            formData.append('desk', this.desk);
+            formData.append('lat', this.lat);
+            formData.append('lng', this.lng);
+            formData.append('lokasi', this.address);
+            formData.append('district', this.district);
+            formData.append('status', this.err);
 
-          // Display the key/value pairs
-          for (var pair of formData.entries()) {
-              console.log(pair[0]+ ': ' + pair[1]); 
+            // Display the key/value pairs
+            for (var pair of formData.entries()) {
+                console.log(pair[0]+ ': ' + pair[1]); 
+            }
+            
+
+            /*Make the request to the POST /single-file URL*/
+            let result = await axios().post('/lapor/', formData);
+            let notif = await axios().post('/notif/', {
+                id: this.idUser,
+                user: 30,
+                kode: result.data.values.insertId,
+                tipe: 'Laporan Keluhan',
+                desk:  `Laporan keluhan baru telah masuk`,
+                status: 'Aktif'
+              });
+            this.openToast('Berhasil menambahkan laporan keluhan');
+            this.$f7router.navigate('/home/');
+            console.log(result.data);
+            
           }
-          
-
-          /*Make the request to the POST /single-file URL*/
-          axios().post('/lapor/', formData)
-          .then(function(response){
-            console.log('SUCCESS!!', response);
-            self.$f7.dialog.alert(response.statusText, 'Berhasil'); 
-            self.$f7router.navigate('/home/');
-            })
-          .catch(function(error){
-            console.log('FAILURE!!', error.message);
-            self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');
-          });
+        } catch (error) {
+          console.log('FAILURE!!', error.response);
+          this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan');
         }
       },
 

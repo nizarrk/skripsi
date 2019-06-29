@@ -31,6 +31,14 @@
             {
               "xml": "<feature name=\"Notification\"><param name=\"android-package\" value=\"org.apache.cordova.dialogs.Notification\" /></feature>",
               "count": 1
+            },
+            {
+              "xml": "<feature name=\"WebShare\"><param name=\"android-package\" value=\"by.chemerisuk.cordova.WebSharePlugin\" /><param name=\"onload\" value=\"false\" /></feature>",
+              "count": 1
+            },
+            {
+              "xml": "<feature name=\"SplashScreen\"><param name=\"android-package\" value=\"org.apache.cordova.splashscreen.SplashScreen\" /><param name=\"onload\" value=\"true\" /></feature>",
+              "count": 1
             }
           ]
         }
@@ -67,6 +75,15 @@
       "PACKAGE_NAME": "com.skripsi.nrk"
     },
     "cordova-plugin-dialogs": {
+      "PACKAGE_NAME": "com.skripsi.nrk"
+    },
+    "cordova-support-android-plugin": {
+      "PACKAGE_NAME": "com.skripsi.nrk"
+    },
+    "cordova-plugin-web-share": {
+      "PACKAGE_NAME": "com.skripsi.nrk"
+    },
+    "cordova-plugin-splashscreen": {
       "PACKAGE_NAME": "com.skripsi.nrk"
     }
   },
@@ -308,6 +325,22 @@
       "merges": [
         "navigator.notification"
       ]
+    },
+    {
+      "id": "cordova-plugin-web-share.WebShare",
+      "file": "plugins/cordova-plugin-web-share/www/WebShare.js",
+      "pluginId": "cordova-plugin-web-share",
+      "clobbers": [
+        "window.navigator.share"
+      ]
+    },
+    {
+      "id": "cordova-plugin-splashscreen.SplashScreen",
+      "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
+      "pluginId": "cordova-plugin-splashscreen",
+      "clobbers": [
+        "navigator.splashscreen"
+      ]
     }
   ],
   "plugin_metadata": {
@@ -315,6 +348,9 @@
     "cordova-plugin-camera": "4.0.3",
     "cordova-plugin-file": "6.0.1",
     "cordova-plugin-file-transfer": "1.7.1",
-    "cordova-plugin-dialogs": "2.0.1"
+    "cordova-plugin-dialogs": "2.0.1",
+    "cordova-support-android-plugin": "1.0.1",
+    "cordova-plugin-web-share": "1.2.0",
+    "cordova-plugin-splashscreen": "5.0.2"
   }
 }

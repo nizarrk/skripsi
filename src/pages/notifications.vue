@@ -1,7 +1,7 @@
 <template>
   <f7-page>
     <f7-navbar title="Notifikasi"></f7-navbar>
-    <div class="list media-list">
+    <div v-if="items.length > 0" class="list media-list">
   <ul>
     <li v-for="(item, index) in items" :key="index" :style="item.status_notifikasi == 'Aktif' ? 'background-color:#E5E9F2' : ''">
       <a v-if="item.tipe_notifikasi == 'Komentar'" :href="'/comments/'+item.id_lapor" class="item-link item-content" @click="updateStatus(item.id_notifikasi)">
@@ -35,7 +35,11 @@
         </div>
       </a>
     </li>
+    <f7-button v-show="all == false" @click="showAll">Lihat Semua</f7-button>
   </ul>
+</div>
+<div v-else style="padding-top: 300px;">
+  <center><span style="font-size: 17px; color: #8e8e93;">Tidak Ada Notifikasi Baru.</span></center>
 </div>
 <!-- <f7-list media-list>
   <f7-list-item
@@ -77,8 +81,7 @@ export default {
     return {
       baseURL: '',
       items: [],
-      link: '',
-      subtitle: '',
+      all: false
     }
   },
   async created() {
@@ -86,20 +89,37 @@ export default {
       this.$f7.preloader.show();
       let baseURL = await axios().request();
       this.baseURL = baseURL.config.baseURL;
-      let result = await axios().get('/notif');
+      let result = await axios().get('/notif/limit');
       this.$f7.preloader.hide();
       console.log(result.data.values);
       this.items = result.data.values;
     } catch (error) {
       console.log(error.message);
-      
+      this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');
     }
   },
   methods: {
+    async showAll() {
+      try {
+        this.all = true;
+        this.$f7.preloader.show();
+        let result = await axios().get('/notif');
+        this.$f7.preloader.hide();
+        this.items = result.data.values;
+      } catch (error) {
+        console.log(error.message);
+        this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');
+      }
+    },
     async updateStatus(id) {
-      await axios().put('/notif/' + id, {
-        status: 'Tidak Aktif'
-      });
+      try {
+        await axios().put('/notif/' + id, {
+          status: 'Tidak Aktif'
+        });
+      } catch (error) {
+        console.log(error.message);
+        this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');
+      }
     }
   },
   mixins: [date]

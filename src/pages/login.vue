@@ -1,6 +1,6 @@
 <template>
   <f7-page no-toolbar no-navbar no-swipeback login-screen>
-    <f7-login-screen-title><img style="width: 70%;" src="../static/dishub.png" alt="logo"></f7-login-screen-title>
+    <f7-login-screen-title><img style="width: 70%;" src="../static/dishub.jpg" alt="logo"></f7-login-screen-title>
     <f7-login-screen-title style="margin-top: -30px; font-size: 30px;">Selamat Datang</f7-login-screen-title>
     <f7-list no-hairlines-md>
   <f7-list-input

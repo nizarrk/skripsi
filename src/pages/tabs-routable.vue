@@ -35,8 +35,8 @@ import axios from '../config/axiosConfig';
     methods: {
       async getData() {
         let result = await axios().get('/notif/count');
-        this.notif = result.data.values.length;
-        console.log('notif',this.notif);
+        this.notif = result.data.values[0].count;
+        console.log('notif',result.data);
       }
     }
   };

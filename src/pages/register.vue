@@ -308,7 +308,7 @@ export default {
                         if (user.data.status == 500) {
                             this.$f7.dialog.alert(user.data.values, 'Terjadi Kesalahan');
                         } else {
-                            this.$f7.dialog.alert(user.statusText, 'Berhasil'); 
+                            this.openToast('Berhasil melakukan registrasi'); 
                             this.$f7router.navigate('/login/');
                         }
                     } catch (error) {
@@ -326,6 +326,17 @@ export default {
                 this.errorforce = false;
                 this.err = "Konfirmasi Password harus diisi"
             }
+        },
+        openToast(text) {
+            console.log(text);
+            
+            this.toastBottom = this.$f7.toast.create({
+                text: text,
+                closeTimeout: 3000,
+            });
+            
+            // Open it
+            this.toastBottom.open();
         }
     }
 }

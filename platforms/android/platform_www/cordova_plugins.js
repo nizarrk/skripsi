@@ -236,6 +236,22 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "merges": [
         "navigator.notification"
       ]
+    },
+    {
+      "id": "cordova-plugin-web-share.WebShare",
+      "file": "plugins/cordova-plugin-web-share/www/WebShare.js",
+      "pluginId": "cordova-plugin-web-share",
+      "clobbers": [
+        "window.navigator.share"
+      ]
+    },
+    {
+      "id": "cordova-plugin-splashscreen.SplashScreen",
+      "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
+      "pluginId": "cordova-plugin-splashscreen",
+      "clobbers": [
+        "navigator.splashscreen"
+      ]
     }
   ];
   module.exports.metadata = {
@@ -243,6 +259,9 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
     "cordova-plugin-camera": "4.0.3",
     "cordova-plugin-file": "6.0.1",
     "cordova-plugin-file-transfer": "1.7.1",
-    "cordova-plugin-dialogs": "2.0.1"
+    "cordova-plugin-dialogs": "2.0.1",
+    "cordova-support-android-plugin": "1.0.1",
+    "cordova-plugin-web-share": "1.2.0",
+    "cordova-plugin-splashscreen": "5.0.2"
   };
 });

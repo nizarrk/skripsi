@@ -218,6 +218,9 @@ import axios from '../config/axiosConfig';
         showPreview3: false,
         imagePreview3: '',
 
+        // user
+        idUser: '',
+
         // form
         form: {
           desk: '',
@@ -238,6 +241,8 @@ import axios from '../config/axiosConfig';
       }
     },
     created() {
+      let decode = this.$jwt.decode();
+      this.idUser = decode.userId;
       // Listen to Cordova's backbutton event
       document.addEventListener('backbutton', this.navigateBack , false);
       let date = new Date();
@@ -439,9 +444,16 @@ import axios from '../config/axiosConfig';
 
                 this.$f7.preloader.show();
                 let result = await axios().post('/izin/', formData);
-                console.log(result.data);
+                let notif = await axios().post('/notif/', {
+                  id: this.idUser,
+                  user: 30,
+                  kode: result.data.values.insertId,
+                  tipe: 'Izin Penggunaan Jalan',
+                  desk:  `Izin penggunaan jalan baru telah masuk`,
+                  status: 'Aktif'
+                });
                 this.$f7.preloader.hide();
-                this.$f7.dialog.alert(result.statusText, 'Berhasil'); 
+                this.openToast('Berhasil menambahkan izin penggunaan jalan'); 
                 this.$f7router.back('', {
                   force: true
                 });
@@ -570,6 +582,17 @@ import axios from '../config/axiosConfig';
             reader3.readAsDataURL( this.file3 );
           }
         }
+      },
+      openToast(text) {
+        console.log(text);
+        
+        this.toastBottom = this.$f7.toast.create({
+          text: text,
+          closeTimeout: 3000,
+        });
+        
+        // Open it
+        this.toastBottom.open();
       }
     },
     beforeDestroy () {

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.skripsi.nrk" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>SKRIPSI!!!</name>
+    <name>E-Dishub</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
     </description>
@@ -18,6 +18,18 @@
     <allow-intent href="geo:*" />
     <platform name="android">
         <allow-intent href="market:*" />
+        <preference name="SplashScreenDelay" value="2000" />
+        <preference name="AutoHideSplashScreen" value="true" />
+        <preference name="SplashScreen" value="splash" />
+        <preference name="ShowSplashScreenSpinner" value="false"/>
+        <preference name="FadeSplashScreen" value="false"/>
+        <preference name="SplashShowOnlyFirstTime" value="false" />
+        <preference name="SplashMaintainAspectRatio" value="true" />
+
+        <icon src="assets/hdpi.png" density="hdpi" />
+        <icon src="assets/xhdpi.png" density="xhdpi" />
+        <icon src="assets/xxhdpi.png" density="xxhdpi" />
+        <icon src="assets/xxxhdpi.png" density="xxxhdpi" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />

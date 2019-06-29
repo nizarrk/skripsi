@@ -106,7 +106,7 @@ export default {
               let notif = await axios().post('/notif/', {
                 id: this.user,
                 user: this.userlapor,
-                lapor: this.idlapor,
+                kode: this.idlapor,
                 tipe: 'Komentar',
                 desk:  `Anda mendapat komentar baru pada laporan ${this.kodelapor}`,
                 status: 'Aktif'
