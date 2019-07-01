@@ -16,7 +16,7 @@
           </a>
           <f7-card-content>
             <p class="date">{{formatTgl(item.tgl_lapor)}}</p>
-            <p>{{item.desk_lapor}}</p>
+            <p>{{item.desk_lapor | limitToDisplay(item.desk_lapor)}}</p>
             <small style="color:red" v-show="item.status_lapor == 'Ditolak'">*{{item.pesan_tolak_lapor}}</small>
           </f7-card-content>
           <f7-card-footer>
@@ -87,6 +87,15 @@ export default {
   beforeDestroy () {
     document.removeEventListener("backbutton", this.navigateBack);
   },
+  filters: {
+        limitToDisplay(text) {
+          if (text.length < 100) {
+            return text;
+          } else {
+            return text.substring(0, 100) + ' ....';
+          }            
+        }
+    },
   mixins: [date]
 }
 </script>

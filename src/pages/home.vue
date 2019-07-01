@@ -24,7 +24,7 @@
         <div class="demo-facebook-date">{{timeDifference(item.tgl_lapor)}}</div>
       </f7-card-header>
       <f7-card-content>
-        <p>{{item.desk_lapor}}</p>
+        <p>{{item.desk_lapor | limitToDisplay(item.desk_lapor)}}</p>
         <a :href="'/report-detail/' + item.id_lapor">
         <img :src="baseURL + item.foto_lapor" style="width: 100%; height: 300px; object-fit: cover;"/>
         <div class="text-block">
@@ -175,6 +175,15 @@ export default {
             this.items = result.data.values;       
         }
       }
+    },
+    filters: {
+        limitToDisplay(text) {
+          if (text.length < 100) {
+            return text;
+          } else {
+            return text.substring(0, 100) + ' ....';
+          }            
+        }
     },
     mixins: [date]
   }

@@ -1,6 +1,6 @@
 <template>
     <f7-page ptr @ptr:refresh="pullToRefresh">
-        <f7-navbar title="Profile">
+        <f7-navbar title="Profil">
           <f7-nav-right>
             <f7-link icon-ios="f7:gear" icon-md="material:settings" href="/settings/"></f7-link>
           </f7-nav-right>

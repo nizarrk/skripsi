@@ -220,7 +220,7 @@ var geocodeService = geocoding.geocodeService();
         if (navigator.camera){
              // Retrieve image file location from specified source
             navigator.camera.getPicture(this.setPicture, this.error, { 
-              quality: 80,
+              quality: 70,
               destinationType: Camera.DestinationType.FILE_URI,
               sourceType: navigator.camera.PictureSourceType.SAVEDPHOTOALBUM 
               });
@@ -232,7 +232,7 @@ var geocodeService = geocoding.geocodeService();
       takePicture() {
         if (navigator.camera) {
           navigator.camera.getPicture(this.setPicture, this.error, {
-            quality: 80,
+            quality: 70,
             destinationType: Camera.DestinationType.FILE_URI,
             sourceType: Camera.PictureSourceType.CAMERA,
             mediaType: Camera.MediaType.PICTURE,

@@ -193,7 +193,7 @@ export default {
             desk: this.desk
             });
             console.log(result.data);
-            this.$f7.dialog.alert(result.statusText, 'Berhasil'); 
+            this.openToast('Berhasil mengubah laporan keluhan');
             this.$f7.popup.close();
             this.$f7router.refreshPage();
         }
@@ -224,7 +224,18 @@ export default {
           console.log(error.message);
           
         }
-      }
+      },
+      openToast(text) {
+            console.log(text);
+            
+            this.toastBottom = this.$f7.toast.create({
+                text: text,
+                closeTimeout: 3000,
+            });
+            
+            // Open it
+            this.toastBottom.open();
+        }
   },
   watch: {
     state: {
