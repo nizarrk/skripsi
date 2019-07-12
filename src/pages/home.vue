@@ -51,10 +51,17 @@
         </a>
       </f7-card-content>
       <f7-card-footer class="no-border">
-        <f7-link v-if="item.pernah_vote == 1" style="color: #2999F3" @click="deleteVote(item.id_vote)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
-        <f7-link v-else @click="vote(item.id_lapor)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
-        <f7-link :href="'/comments/' + item.id_lapor"><f7-icon material="comment" size="20px"></f7-icon> Komentar</f7-link>
-        <f7-link @click="share"><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
+        <f7-row>
+          <f7-col style="padding-left: 50px;">
+            <f7-link v-if="item.pernah_vote == 1" style="color: #2999F3" @click="deleteVote(item.id_vote)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
+            <f7-link v-else @click="vote(item.id_lapor)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
+          </f7-col>
+          <f7-col style="padding-left: 50px;">
+            <f7-link :href="'/comments/' + item.id_lapor"><f7-icon material="comment" size="20px"></f7-icon> Komentar</f7-link>
+          </f7-col>
+          
+          <!-- <f7-link @click="share"><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link> -->
+        </f7-row>
       </f7-card-footer>
     </f7-card>
   </f7-page>

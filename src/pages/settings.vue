@@ -3,17 +3,10 @@
     <f7-navbar title="Pengaturan" back-link="Back"></f7-navbar>
     <f7-block>
         <f7-list>
-            <f7-list-item title="Mode Malam">
-                <f7-icon slot="media" md="material:brightness_2"></f7-icon>
-                <f7-toggle></f7-toggle>
-            </f7-list-item>
             <f7-list-item title="Ubah Kata Sandi" link="/settings-pass/">
                 <f7-icon slot="media" md="material:lock"></f7-icon>
             </f7-list-item>
-            <f7-list-item title="Bantuan" link="#">
-                <f7-icon slot="media" md="material:help_outline"></f7-icon>
-            </f7-list-item>
-            <f7-list-item title="Tentang Aplikasi" link="#">
+            <f7-list-item title="Tentang Aplikasi" link="/about/">
                 <f7-icon slot="media" md="material:apps"></f7-icon>
             </f7-list-item>
         </f7-list>
