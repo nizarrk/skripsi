@@ -42,90 +42,84 @@
 </template>
 
 <script>
-import axios from '../config/axiosConfig';
-import date from '../mixins/dateConfig';
+import axios from '../config/axiosConfig'
+import date from '../mixins/dateConfig'
 
 export default {
-  data() {
+  data () {
     return {
       baseURL: '',
       items: [],
       photos: []
     }
   },
-  async created() {
+  async created () {
     try {
       // Listen to Cordova's backbutton event
-      document.addEventListener('backbutton', this.navigateBack , false);
-      let baseURL = await axios().request();
-      this.baseURL = baseURL.config.baseURL;
-      this.$f7.preloader.show();
-      let result = await axios().get('/izin/');
-      this.$f7.preloader.hide();
-      console.log(result.data.values);
-      
-      
-      this.items = result.data.values;
+      document.addEventListener('backbutton', this.navigateBack, false)
+      let baseURL = await axios().request()
+      this.baseURL = baseURL.config.baseURL
+      this.$f7.preloader.show()
+      let result = await axios().get('/izin/')
+      this.$f7.preloader.hide()
+      console.log(result.data.values)
+
+      this.items = result.data.values
     } catch (error) {
-      
+
     }
   },
   methods: {
-    navigateBack() {
-      let app = this.$f7;
-      let $$ = this.$$;
+    navigateBack () {
+      let app = this.$f7
+      let $$ = this.$$
       // Use Framework7's router to navigate back
-      let mainView = app.views.main;          
+      let mainView = app.views.main
       if (app.views.main.router.url == '/home/tab1') {
-          navigator.app.exitApp();
+        navigator.app.exitApp()
       } else {
-          mainView.router.back('', {
+        mainView.router.back('', {
           force: true
-          });
+        })
       }
     },
-    async openPhoto(id){
-      let newarr = [];
-      console.log('atas');
-      let result = await axios().get('/izin/' + id);
-      newarr.push(this.baseURL + result.data.values[0].surat_izin, this.baseURL + result.data.values[0].ktp_izin, this.baseURL + result.data.values[0].kk_izin);
+    async openPhoto (id) {
+      let newarr = []
+      console.log('atas')
+      let result = await axios().get('/izin/' + id)
+      newarr.push(this.baseURL + result.data.values[0].surat_izin, this.baseURL + result.data.values[0].ktp_izin, this.baseURL + result.data.values[0].kk_izin)
       this.photos.push(...newarr)
-            
-      
-      // Hide the modal manually
-          this.$nextTick(() => {
-            console.log('bawah');
-            if (this.photos.length > 3) {           
-            
-            console.log('spliced');
-            
-              this.photos.splice(0, this.photos.length);
-              this.photos.push(...newarr)
-              
-              this.$refs.standalone.open(0);
-            } else {
-              console.log('not spliced');
-              
-              this.$refs.standalone.open(0);
-            }
-            
-            
-            
-          })
-    },
-    async pullToRefresh(event, done) {
-        let self = this;
 
-        setTimeout(async () => {
-          let result = await axios().get('/izin/');
-          self.items = result.data.values;
-          
-          done();
-        }, 1000);
-      }
+      // Hide the modal manually
+      this.$nextTick(() => {
+        console.log('bawah')
+        if (this.photos.length > 3) {
+          console.log('spliced')
+
+          this.photos.splice(0, this.photos.length)
+          this.photos.push(...newarr)
+
+          this.$refs.standalone.open(0)
+        } else {
+          console.log('not spliced')
+
+          this.$refs.standalone.open(0)
+        }
+      })
+    },
+    async pullToRefresh (event, done) {
+      let self = this
+
+      setTimeout(async () => {
+        let result = await axios().get('/izin/')
+        self.items = result.data.values
+
+        done()
+      }, 1000)
+    }
   },
   beforeDestroy () {
-    document.removeEventListener("backbutton", this.navigateBack);
+    document.removeEventListener('backbutton', this.navigateBack)
   },
   mixins: [date]
 }

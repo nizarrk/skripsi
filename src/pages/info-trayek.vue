@@ -14,52 +14,51 @@
     </f7-page>
 </template>
 <script>
-import {LMap, LTileLayer, LMarker, LPopup, LPolyline } from 'vue2-leaflet';
-import axios from '../config/axiosConfig';
+import {LMap, LTileLayer, LMarker, LPopup, LPolyline } from 'vue2-leaflet'
+import axios from '../config/axiosConfig'
 
 export default {
   props: {
     id: String
   },
   components: {
-      LMap,
-      LTileLayer,
-      LMarker,
-      LPopup,
-      LPolyline
+    LMap,
+    LTileLayer,
+    LMarker,
+    LPopup,
+    LPolyline
   },
-  data() {
-      return {
-        zoom:13,
-        center: L.latLng(-7.470475, 112.440132),
-        url:'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-        attribution:'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-        marker: L.latLng(-7.470475, 112.440132), 
-        address: null,
-        polyline: {
-          latlngs: [],
-          color: 'blue'
-        },
-        items: [],
-        nama: ''
+  data () {
+    return {
+      zoom: 13,
+      center: L.latLng(-7.470475, 112.440132),
+      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      marker: L.latLng(-7.470475, 112.440132),
+      address: null,
+      polyline: {
+        latlngs: [],
+        color: 'blue'
+      },
+      items: [],
+      nama: ''
     }
   },
-  async created() {
+  async created () {
     try {
-      let result = await axios().get('/info/trayek/' + this.id);
-      this.nama = result.data.values[0].nama_trayek;
-      console.log(JSON.parse(result.data.values[0].latlng_trayek));
-      this.polyline.latlngs = JSON.parse(result.data.values[0].latlng_trayek);
-      
+      let result = await axios().get('/info/trayek/' + this.id)
+      this.nama = result.data.values[0].nama_trayek
+      console.log(JSON.parse(result.data.values[0].latlng_trayek))
+      this.polyline.latlngs = JSON.parse(result.data.values[0].latlng_trayek)
     } catch (error) {
-      
+
     }
-  },
-    // mounted () {
-    //   this.$nextTick(() => {
-    //     this.$refs.myMap.mapObject.ANY_LEAFLET_MAP_METHOD();
-    //   })
-    // }
+  }
+  // mounted () {
+  //   this.$nextTick(() => {
+  //     this.$refs.myMap.mapObject.ANY_LEAFLET_MAP_METHOD();
+  //   })
+  // }
 }
 </script>
 <style>
@@ -67,5 +66,3 @@ export default {
   display: none;
 }
 </style>
-
-

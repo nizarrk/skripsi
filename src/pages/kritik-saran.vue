@@ -55,38 +55,49 @@
 </template>
 
 <script>
-import axios from '../config/axiosConfig';
+import axios from '../config/axiosConfig'
 
 export default {
-  data() {
+  data () {
     return {
       rate: '',
       desk: ''
     }
   },
-  created() {
+  created () {
     // Listen to Cordova's backbutton event
-    document.addEventListener('backbutton', this.navigateBack , false);
+    document.addEventListener('backbutton', this.navigateBack, false)
   },
   methods: {
-    navigateBack() {
-      let app = this.$f7;
-      let $$ = this.$$;
+    navigateBack () {
+      let app = this.$f7
+      let $$ = this.$$
       // Use Framework7's router to navigate back
-      let mainView = app.views.main;          
+      let mainView = app.views.main
       if (app.views.main.router.url == '/home/tab1') {
-        navigator.app.exitApp();
+        navigator.app.exitApp()
       } else {
         mainView.router.back('', {
-            force: true
-        });
+          force: true
+        })
       }
     },
-    async submitForm() {
+    openToast (text) {
+      console.log(text)
+
+      this.toastBottom = this.$f7.toast.create({
+        text: text,
+        closeTimeout: 3000
+      })
+
+      // Open it
+      this.toastBottom.open()
+    },
+    async submitForm () {
       try {
-        if (this.rate =='' || this.desk == '') {
-          this.$f7.input.validateInputs(document.getElementsByTagName('input'));
-          this.$f7.dialog.alert('Harap lengkapi pengisian form', 'Terjadi Kesalahan');
+        if (this.rate == '' || this.desk == '') {
+          this.$f7.input.validateInputs(document.getElementsByTagName('input'))
+          this.$f7.dialog.alert('Harap lengkapi pengisian form', 'Terjadi Kesalahan')
         } else {
           // let formData = new FormData();
 
@@ -96,34 +107,33 @@ export default {
 
           // // Display the key/value pairs
           // for (var pair of formData.entries()) {
-          //     console.log(pair[0]+ ': ' + pair[1]); 
+          //     console.log(pair[0]+ ': ' + pair[1]);
           // }
 
-
-          let result = await axios().post('/kritik/', {
+          let result = await axios().post('/critic/add', {
             rate: this.rate,
             desk: this.desk
-          });
-          console.log(result.data);
-          this.$f7.dialog.alert(result.statusText, 'Berhasil'); 
+          })
+          console.log(result.data)
+          // this.$f7.dialog.alert(result.statusText, 'Berhasil');
+          this.openToast('Berhasil menambahkan kritik saran')
           this.$f7router.back('', {
             force: true
-          });
-          }
+          })
+        }
       } catch (error) {
-        console.log(error.message);
-          
+        console.log(error.message)
       }
-    },
+    }
   },
   beforeDestroy () {
-    document.removeEventListener("backbutton", this.navigateBack);
-  },
+    document.removeEventListener('backbutton', this.navigateBack)
+  }
 }
 </script>
 <style scoped>
 /* HIDE RADIO */
-[type=radio] { 
+[type=radio] {
   position: absolute;
   opacity: 0;
   width: 0;

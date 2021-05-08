@@ -5,21 +5,21 @@
       <!-- <f7-messages-title><b>Sunday, Feb 9,</b> 12:58</f7-messages-title> -->
       <f7-message
         v-for="(message, index) in items"
-        :id="message.id_komentar"
+        :id="message.id"
         :key="index"
-        :type="message.id_user == user ? 'sent' : 'received'"
-        :text-header="timeDifference(message.tgl_komentar)"
-        :name="message.nama_user"
-        :avatar="baseURL + message.foto_user"
+        :type="message.user_id == user ? 'sent' : 'received'"
+        :text-header="timeDifference(message.created_at)"
+        :name="message.user.name"
+        :avatar="baseURL + message.user.picture"
         :first="isFirstMessage(message, index)"
         :last="isLastMessage(message, index)"
         :tail="isTailMessage(message, index)"
-        @click="openPopover(message.id_komentar, message.id_user)"
+        @click="openPopover(message.id, message.user_id)"
       >
-        <span slot="text">{{message.desk_komentar}}</span>
+        <span slot="text">{{message.description}}</span>
       </f7-message>
     </f7-messages>
-  
+
     <f7-messagebar
       placeholder="Ketik Komentar"
       ref="messagebar"
@@ -44,14 +44,14 @@
 </template>
 
 <script>
-import date from '../mixins/dateConfig';
-import axios from '../config/axiosConfig';
+import date from '../mixins/dateConfig'
+import axios from '../config/axiosConfig'
 
 export default {
   props: {
     id: String
   },
-  data() {
+  data () {
     return {
       baseURL: '',
       msg: '',
@@ -66,145 +66,145 @@ export default {
       idlapor: ''
     }
   },
-  async created() {
-    this.$f7.preloader.show();
-    let baseURL = await axios().request();
-    this.baseURL = baseURL.config.baseURL;
-    let result = await axios().get('/komentar/' + this.id);
-    this.$f7.preloader.hide();
-    console.log(result.data.values);
-    this.items = result.data.values;
-    let decode = this.$jwt.decode(localStorage.getItem('token'));
-    this.user = decode.userId;
-    this.userlapor = result.data.values[0].id_user_lapor;
-    this.kodelapor = result.data.values[0].kode_lapor;
-    this.idlapor = result.data.values[0].id_lapor;
+  async created () {
+    try {
+      this.$f7.preloader.show()
+      let baseURL = await axios().request()
+      this.baseURL = baseURL.config.baseURL
+      let result = await axios().get('/comment/' + this.id)
+      this.$f7.preloader.hide()
+      console.log(result.data.data)
+      this.items = result.data.data
+      let decode = this.$jwt.decode(localStorage.getItem('token'))
+      console.log(decode)
+      this.user = decode.id
+      this.userlapor = result.data.data[0].report.user_id
+      this.kodelapor = result.data.data[0].report.code
+      this.idlapor = result.data.data[0].report_id
 
-    console.log(this.user + '=' + this.userlapor);
-    
+      console.log(this.user + '=' + this.userlapor)
+    } catch (error) {
+      console.log(error)
+      this.$f7.preloader.hide()
+      this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan')
+    }
   },
   methods: {
-    async postComment() {
+    async postComment () {
       try {
         if (this.msg == '') {
-          this.showToast('Komentar kosong');
-          
+          this.showToast('Komentar kosong')
         } else {
           if (this.idkomen == null) {
-            console.log('post');
-            
-            let comment = await axios().post('/komentar', {
+            console.log('post')
+
+            let comment = await axios().post('/comment/add', {
               idlapor: this.id,
               desk: this.msg
-            });
-          
-            console.log(comment);
-            this.state = 'post';
-            this.msg = '';
-            
+            })
+
+            console.log(comment)
+            this.state = 'post'
+            this.msg = ''
+
             if (this.user !== this.userlapor) {
-              let notif = await axios().post('/notif/', {
-                id: this.user,
-                user: this.userlapor,
-                kode: this.idlapor,
-                tipe: 'Komentar',
-                desk:  `Anda mendapat komentar baru pada laporan ${this.kodelapor}`,
-                status: 'Aktif'
-              }); 
+              let notif = await axios().post('/notification/add', {
+                user_id: this.userlapor,
+                report_id: this.idlapor,
+                type: 'Komentar',
+                desc: `Anda mendapat komentar baru pada laporan ${this.kodelapor}`
+              })
             }
           } else {
-            console.log('put');
-            
-            let update = await axios().put('/komentar', {
-              desk: this.msg,
-              id: this.idkomen
-            });
-            this.state = 'put';
-            this.showToast('Komentar diubah');
+            console.log('put')
 
-            this.msg = '';
-            this.idkomen = null;
+            let update = await axios().put('/comment/edit/' + this.idkomen, {
+              desk: this.msg
+            })
+            this.state = 'put'
+            this.showToast('Komentar diubah')
 
-            console.log(update.data);
+            this.msg = ''
+            this.idkomen = null
+
+            console.log(update.data)
           }
-        }        
+        }
       } catch (error) {
-        console.log(error);
-        this.showToast(error.message);
-      } 
+        console.log(error)
+        this.showToast(error.message)
+      }
     },
-    openPopover(id, user) {
+    openPopover (id, user) {
       try {
         if (user == this.user) {
-          this.$f7.popover.open(document.getElementById('popover'), document.getElementById(id), true);
-          this.idkomen = id;
+          this.$f7.popover.open(document.getElementById('popover'), document.getElementById(id), true)
+          this.idkomen = id
         }
-        
       } catch (error) {
-        console.log(error);
-        this.showToast(error.message);
+        console.log(error)
+        this.showToast(error.message)
       }
     },
-    async editComment() {
+    async editComment () {
       try {
-        let getid = await axios().get('/komentar/getid/' + this.idkomen);
-        console.log(getid.data);
-        this.msg = getid.data.values[0].desk_komentar;  
-
+        let getById = await axios().get('/comment/idd/' + this.idkomen)
+        console.log(getById.data)
+        this.msg = getById.data.data.description
       } catch (error) {
-        this.showToast(error.message);
+        // this.showToast(error.response.data.message);
+        this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan')
       }
     },
-    async deleteComment() {
+    async deleteComment () {
       try {
-        await axios().delete('/komentar/' + this.idkomen);
-        this.state = 'delete';
-        
-        this.showToast('Komentar dihapus');
+        await axios().put('/comment/remove/' + this.idkomen)
+        this.state = 'delete'
 
-        this.msg = '';
-        this.idkomen = null;
+        this.showToast('Komentar dihapus')
+
+        this.msg = ''
+        this.idkomen = null
       } catch (error) {
-        this.showToast(error.message);
-        
+        this.showToast(error.message)
       }
     },
-    isFirstMessage(message, index) {
-      const self = this;
-      const previousMessage = self.items[index - 1];
-      if (!previousMessage || previousMessage.nama_user !== message.nama_user) return true;
-      return false;
+    isFirstMessage (message, index) {
+      const self = this
+      const previousMessage = self.items[index - 1]
+      if (!previousMessage || previousMessage.name !== message.name) return true
+      return false
     },
-    isLastMessage(message, index) {
-      const self = this;
-      const nextMessage = self.items[index + 1];
-      if (!nextMessage || nextMessage.nama_user !== message.nama_user ) return true;
-      return false;
+    isLastMessage (message, index) {
+      const self = this
+      const nextMessage = self.items[index + 1]
+      if (!nextMessage || nextMessage.name !== message.name) return true
+      return false
     },
-    isTailMessage(message, index) {
-      const self = this;
-      const nextMessage = self.items[index + 1];
-      if (!nextMessage || nextMessage.nama_user !== message.nama_user) return true;
-      return false;
+    isTailMessage (message, index) {
+      const self = this
+      const nextMessage = self.items[index + 1]
+      if (!nextMessage || nextMessage.name !== message.name) return true
+      return false
     },
-    showToast(text) {
+    showToast (text) {
       this.toastCenter = this.$f7.toast.create({
         text: text,
         position: 'center',
-        closeTimeout: 2000,
-      });
+        closeTimeout: 2000
+      })
 
-      this.toastCenter.open();
-    },
+      this.toastCenter.open()
+    }
   },
   watch: {
     state: {
-      async handler() {
-          console.log(this.state);
-          let result = await axios().get('/komentar/' + this.id);
-          this.items = result.data.values;       
-          console.log(this.items);
-          this.state = '';
+      async handler () {
+        console.log(this.state)
+        let result = await axios().get('/comment/' + this.id)
+        this.items = result.data.data
+        console.log(this.items)
+        this.state = ''
       }
     }
   },

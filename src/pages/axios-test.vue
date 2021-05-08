@@ -4,8 +4,8 @@
     <form @submit.prevent="add">
         <input type="hidden" v-model="form.id">
         <input type="text" v-model="form.name">
-        <button type="submit" v-show="!updateSubmit">add</button>  
-        <button type="button" v-show="updateSubmit" @click="update(form)">Update</button> 
+        <button type="submit" v-show="!updateSubmit">add</button>
+        <button type="button" v-show="updateSubmit" @click="update(form)">Update</button>
     </form>
     <ul v-for="user in users" :key="user.id_user">
       <li v-bind:userid="user.id_user">

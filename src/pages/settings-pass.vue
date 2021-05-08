@@ -48,58 +48,68 @@
     </f7-page>
 </template>
 <script>
-import axios from '../config/axiosConfig';
+import axios from '../config/axiosConfig'
 
 export default {
-    data() {
-        return {
-            oldpass: null,
-            pass: null,
-            confpass: null,
-            error: 'Konfirmasi Password harus diisi',
-            errorforce: false,
-        }
-    },
-    methods: {
-        async formSubmit() {
-            if (document.getElementById('form').checkValidity() == false) {
-                this.$f7.input.validateInputs(document.getElementById('form'));
-            } else {
-                if (this.errorforce == true) {
-                    this.errorforce = false;
-                    
-                } else {                    
-                    try {
-                        let user = await axios().put('/user/pass/', {
-                            pass: this.oldpass,
-                            newpass: this.pass
-                        });
-                        console.log('SUCCESS!!', user.data);
-                        if (user.data.status == 500) {
-                            this.$f7.dialog.alert(user.data.values, 'Terjadi Kesalahan');
-                        } else {
-                            this.$f7.dialog.alert(user.statusText, 'Berhasil'); 
-                            this.$f7router.back('', {
-                                force: true
-                            });
-                        }
-                    } catch (error) {
-                        console.log('ERROR!!', error);
-                        this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
-                    }
-                }
-            }
-        },
-        checkPass() {            
-            if (this.pass != this.confpass) {
-                this.errorforce = true;
-                this.error = "Password tidak sesuai"
-            } else {
-                this.errorforce = false;
-                this.error = "Konfirmasi Password harus diisi"
-            }
-        }
+  data () {
+    return {
+      oldpass: null,
+      pass: null,
+      confpass: null,
+      error: 'Konfirmasi Password harus diisi',
+      errorforce: false
     }
+  },
+  methods: {
+    async formSubmit () {
+      console.log(document.getElementById('form').checkValidity())
+      if (document.getElementById('form').checkValidity() == false) {
+        console.log('a')
+        this.$f7.input.validateInputs(document.getElementById('form'))
+      } else {
+        if (this.errorforce == true) {
+          console.log('b')
+          // this.errorforce = false;
+        } else {
+          try {
+            console.log('c')
+            let user = await axios().put('/user/edit/password', {
+              pass: this.oldpass,
+              newpass: this.pass
+            })
+            console.log('SUCCESS!!', user.data)
+
+            this.openToast('Berhasil mengubah password')
+            this.$f7router.back('', {
+              force: true
+            })
+          } catch (error) {
+            console.log('ERROR!!', error.response)
+            this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan')
+          }
+        }
+      }
+    },
+    openToast (text) {
+      console.log(text)
+
+      this.toastBottom = this.$f7.toast.create({
+        text: text,
+        closeTimeout: 3000
+      })
+
+      // Open it
+      this.toastBottom.open()
+    },
+    checkPass () {
+      if (this.pass != this.confpass) {
+        this.errorforce = true
+        this.error = 'Password tidak sesuai'
+      } else {
+        this.errorforce = false
+        // this.error = "Konfirmasi Password harus diisi"
+      }
+    }
+  }
 }
 </script>
-

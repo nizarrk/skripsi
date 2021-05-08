@@ -24,36 +24,36 @@
   </f7-page>
 </template>
 <script>
-  export default {
-    data() {
-      const colors = [
-        'red',
-        'green',
-        'blue',
-        'pink',
-        'yellow',
-        'orange',
-        'gray',
-        'black',
-      ];
-      return {
-        colors,
-        colorsAmount: colors.length,
-      };
+export default {
+  data () {
+    const colors = [
+      'red',
+      'green',
+      'blue',
+      'pink',
+      'yellow',
+      'orange',
+      'gray',
+      'black'
+    ]
+    return {
+      colors,
+      colorsAmount: colors.length
+    }
+  },
+  methods: {
+    setLayoutTheme (theme) {
+      const self = this
+      const app = self.$f7
+      app.root.removeClass('theme-dark theme-light').addClass(`theme-${theme}`)
     },
-    methods: {
-      setLayoutTheme(theme) {
-        const self = this;
-        const app = self.$f7;
-        app.root.removeClass('theme-dark theme-light').addClass(`theme-${theme}`);
-      },
-      setColorTheme(color) {
-        const self = this;
-        const app = self.$f7;
-        const currentColorClass = app.root[0].className.match(/color-theme-([a-z]*)/);
-        if (currentColorClass) app.root.removeClass(currentColorClass[0]);
-        app.root.addClass(`color-theme-${color}`);
-      },
-    },
-  };
+    setColorTheme (color) {
+      const self = this
+      const app = self.$f7
+      const currentColorClass = app.root[0].className.match(/color-theme-([a-z]*)/)
+      if (currentColorClass) app.root.removeClass(currentColorClass[0])
+      app.root.addClass(`color-theme-${color}`)
+    }
+  }
+}
 </script>

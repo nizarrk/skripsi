@@ -9,10 +9,10 @@
 </template>
 <script>
 export default {
-    data() {
-      return {
-        isBottom: true,
-      };
+  data () {
+    return {
+      isBottom: true
     }
   }
+}
 </script>

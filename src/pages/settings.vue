@@ -3,6 +3,9 @@
     <f7-navbar title="Pengaturan" back-link="Back"></f7-navbar>
     <f7-block>
         <f7-list>
+            <f7-list-item title="Ubah Profil" :link="'/profile-edit/' + id">
+                <f7-icon slot="media" md="material:person"></f7-icon>
+            </f7-list-item>
             <f7-list-item title="Ubah Kata Sandi" link="/settings-pass/">
                 <f7-icon slot="media" md="material:lock"></f7-icon>
             </f7-list-item>
@@ -23,36 +26,38 @@
 
 <script>
 export default {
-    data() {
-        return {
-
-        }
+  data () {
+    return {
+      id: null
+    }
+  },
+  created () {
+    let decode = this.$jwt.decode(localStorage.getItem('token'))
+    this.id = decode
+    // Listen to Cordova's backbutton event
+    document.addEventListener('backbutton', this.navigateBack, false)
+  },
+  methods: {
+    navigateBack () {
+      let app = this.$f7
+      let $$ = this.$$
+      // Use Framework7's router to navigate back
+      let mainView = app.views.main
+      if (app.views.main.router.url == '/home/tab1') {
+        navigator.app.exitApp()
+      } else {
+        mainView.router.back('', {
+          force: true
+        })
+      }
     },
-    created() {
-        // Listen to Cordova's backbutton event
-        document.addEventListener('backbutton', this.navigateBack , false);
-    },
-    methods: {
-        navigateBack() {
-            let app = this.$f7;
-            let $$ = this.$$;
-            // Use Framework7's router to navigate back
-            let mainView = app.views.main;          
-            if (app.views.main.router.url == '/home/tab1') {
-                navigator.app.exitApp();
-            } else {
-                mainView.router.back('', {
-                    force: true
-                });
-            }
-        },
-        logOut() {
-            localStorage.removeItem('token');
-            this.$f7router.navigate('/login/');
-        }
-    },
-    beforeDestroy () {
-        document.removeEventListener("backbutton", this.navigateBack);
-    },
+    logOut () {
+      localStorage.removeItem('token')
+      this.$f7router.navigate('/login/')
+    }
+  },
+  beforeDestroy () {
+    document.removeEventListener('backbutton', this.navigateBack)
+  }
 }
 </script>

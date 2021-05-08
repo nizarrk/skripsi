@@ -54,97 +54,93 @@
     </f7-page>
 </template>
 <script>
-import axios from '../config/axiosConfig';
+import axios from '../config/axiosConfig'
 export default {
-    data(){
-        return{
-            baseURL: '',
-            items: [],
-            form: []
-        }
-    },
-    async created() {
-        try {
-            // Listen to Cordova's backbutton event
-            document.addEventListener('backbutton', this.navigateBack , false);
-            let baseURL = await axios().request();
-            this.baseURL = baseURL.config.baseURL;
-            this.$f7.preloader.show();
-            let result = await axios().get('/survey/list');
-            this.$f7.preloader.hide();
-            //console.log(result.data.values);
+  data () {
+    return {
+      baseURL: '',
+      items: [],
+      form: []
+    }
+  },
+  async created () {
+    try {
+      // Listen to Cordova's backbutton event
+      document.addEventListener('backbutton', this.navigateBack, false)
+      let baseURL = await axios().request()
+      this.baseURL = baseURL.config.baseURL
+      this.$f7.preloader.show()
+      let result = await axios().get('/survey/list')
+      this.$f7.preloader.hide()
+      // console.log(result.data.values);
 
-            result.data.values.map((e, i) => {
-                this.form.push({
-                    soal: e.id_pertanyaan_survey,
-                    jwb: null
-                })
-                
+      result.data.values.map((e, i) => {
+        this.form.push({
+          soal: e.id_pertanyaan_survey,
+          jwb: null
+        })
+      })
+
+      this.items = result.data.values
+      console.log(result.data)
+    } catch (error) {
+      console.log(error.message)
+      this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan')
+    }
+  },
+  methods: {
+    navigateBack () {
+      let app = this.$f7
+      let $$ = this.$$
+      // Use Framework7's router to navigate back
+      let mainView = app.views.main
+      if (app.views.main.router.url == '/home/tab1') {
+        navigator.app.exitApp()
+      } else {
+        mainView.router.back('', {
+          force: true
+        })
+      }
+    },
+    async submitForm () {
+      try {
+        let empty = this.form.some(e => e.jwb === null)
+        if (empty) {
+          this.$f7.dialog.alert('Lengkapi pengisan survey', 'Terjadi Kesalahan')
+        } else {
+          this.$f7.preloader.show()
+          this.form.map(async (e, i) => {
+            let result = await axios().post('/survey/submit', {
+              soal: e.soal,
+              jwb: e.jwb
             })
+          })
 
-            this.items = result.data.values;
-            console.log(result.data);
-        } catch (error) {
-            console.log(error.message);
-            this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
+          this.$f7.preloader.hide()
+          this.openToast('Berhasil mengisi data survey')
+          this.$f7router.back('', {
+            force: true
+          })
         }
+      } catch (error) {
+        console.log(error.message)
+        this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan')
+      }
     },
-    methods:{
-        navigateBack() {
-            let app = this.$f7;
-            let $$ = this.$$;
-            // Use Framework7's router to navigate back
-            let mainView = app.views.main;          
-            if (app.views.main.router.url == '/home/tab1') {
-                navigator.app.exitApp();
-            } else {
-                mainView.router.back('', {
-                    force: true
-                });
-            }
-        },
-        async submitForm() {
-            try {
-                let empty = this.form.some(e => e.jwb === null);
-                if (empty) {
-                    this.$f7.dialog.alert('Lengkapi pengisan survey', 'Terjadi Kesalahan');
-                } else {
-                    this.$f7.preloader.show();
-                    this.form.map(async (e, i) => {
-                        let result = await axios().post('/survey/submit', {
-                            soal: e.soal,
-                            jwb: e.jwb
-                        });                                      
-                    });
-                    
-                    
-                    this.$f7.preloader.hide();
-                    this.openToast('Berhasil mengisi data survey') 
-                    this.$f7router.back('', {
-                        force: true
-                    });
-                }
-                
-            } catch (error) {
-                console.log(error.message);
-                this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
-            }
-        },
-        openToast(text) {
-            console.log(text);
-            
-            this.toastBottom = this.$f7.toast.create({
-                text: text,
-                closeTimeout: 3000,
-            });
-            
-            // Open it
-            this.toastBottom.open();
-        }
-    },
-    beforeDestroy () {
-        document.removeEventListener("backbutton", this.navigateBack);
-    },
+    openToast (text) {
+      console.log(text)
+
+      this.toastBottom = this.$f7.toast.create({
+        text: text,
+        closeTimeout: 3000
+      })
+
+      // Open it
+      this.toastBottom.open()
+    }
+  },
+  beforeDestroy () {
+    document.removeEventListener('backbutton', this.navigateBack)
+  }
 }
 </script>
-

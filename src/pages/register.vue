@@ -7,7 +7,7 @@
     </f7-navbar>
     <f7-block>
         <center>
-            <img style="border-radius:50px; max-width: 100px;" 
+            <img style="border-radius:50px; max-width: 100px;"
             :src="imagePreview" /><br>
             <span>{{filename}}</span>
             <!-- <f7-link style="margin-left:-20px;" href="#"><f7-icon ios="f7:camera" md="material:camera_alt" size="34px"></f7-icon></f7-link> -->
@@ -36,7 +36,7 @@
                 validate
                 clear-button
             ></f7-list-input>
-            
+
             <f7-list-input
                 label="Alamat"
                 name="alamat"
@@ -66,16 +66,16 @@
 
             <f7-list-input
                 label="Jenis Kelamnin"
-                name="jk"
+                name="gender"
                 type="select"
-                defaultValue="Laki-laki"
+                defaultValue="1"
                 placeholder="-Pilih-"
-                @input="jk = $event.target.value"
+                @input="gender = $event.target.value"
                 required
                 validate
             >
-                <option value="Laki-laki">Laki-laki</option>
-                <option value="Perempuan">Perempuan</option>
+                <option value="1">Laki-laki</option>
+                <option value="2">Perempuan</option>
             </f7-list-input>
 
             <f7-list-input
@@ -90,6 +90,19 @@
                 validate
             >
             </f7-list-input>
+
+            <f7-list-input
+                label="Username"
+                name="username"
+                type="text"
+                placeholder="Username"
+                error-message="Username harus diisi"
+                :value="username"
+                @input="username = $event.target.value"
+                required
+                validate
+                clear-button
+            ></f7-list-input>
 
             <f7-list-input
                 label="Email"
@@ -138,207 +151,213 @@
 </template>
 
 <script>
-import axios from '../config/axiosConfig';
+import axios from '../config/axiosConfig'
 import defaultImg from '../static/defaultuser.jpg'
 
 export default {
-    data() {
-        return {
-            // uploads
-            filename: '',
-            file: null,
-            showPreview: false,
-            imagePreview: defaultImg,
+  data () {
+    return {
+      // uploads
+      filename: '',
+      file: null,
+      showPreview: false,
+      imagePreview: defaultImg,
 
-            nama: null,
-            alamat: null,
-            telepon: null,
-            jk: 'Laki-laki',
-            tgl: '2014-04-30',
-            email: null,
-            pass: null,
-            confpass: null,
-            err: 'Konfirmasi Password harus diisi',
-            errorforce: false,
+      nama: null,
+      alamat: null,
+      telepon: null,
+      gender: 1,
+      tgl: '2014-04-30',
+      username: null,
+      email: null,
+      pass: null,
+      confpass: null,
+      err: 'Konfirmasi Password harus diisi',
+      errorforce: false,
 
-            //camera
-            camera: navigator.camera
-            
-        }
+      // camera
+      camera: navigator.camera
+
+    }
+  },
+  methods: {
+    default () {
+      console.log('defaultCallback')
     },
-    methods: {
-        default(){
-        console.log('defaultCallback');
-        
-        },
-        openGalleryWeb(){
-            document.getElementById('file-input').click();
-            this.$refs.actionsOneGroup.close();
-        },
-        //get photo from gallery
-        openGallery(){
-            if (navigator.camera){
-                // Retrieve image file location from specified source
-                navigator.camera.getPicture(this.setPicture, this.error, { 
-                quality: 80,
-                destinationType: Camera.DestinationType.FILE_URI,
-                sourceType: navigator.camera.PictureSourceType.SAVEDPHOTOALBUM 
-                });
-            }else{
-                this.error;
-            }
-        },
-        // Use the camera plugin to capture image
-        takePicture() {
-            if (navigator.camera) {
-            navigator.camera.getPicture(this.setPicture, this.error, {
-                quality: 80,
-                destinationType: Camera.DestinationType.FILE_URI,
-                sourceType: Camera.PictureSourceType.CAMERA,
-                mediaType: Camera.MediaType.PICTURE,
-                encodingType: Camera.EncodingType.JPEG,
-                cameraDirection: Camera.Direction.BACK,
-                targetWidth: 300,
-                targetHeight: 400
-            });
-            }else{
-            // If the navigator.camera is not available display generic error to the user.
-            this.error();
-            }
-        },
-        // Set the picture path in the data of the vue
-        // this action will automatically update the view.
-        setPicture(imagePath){
-            let self = this;
-            this.$f7.preloader.show();
-            this.imagePreview = imagePath;
-            this.showPreview = false;
 
-            window.resolveLocalFileSystemURL(imagePath, 
-          function(fileEntry){
-              //alert("got image file entry: " + fileEntry.fullPath);
-              //self.filename = fileEntry.fullPath.replace("/", "");
-              fileEntry.file(function(file){ //should return a raw HTML File Object
-                let reader = new FileReader();
-                    reader.onloadend = function(e) {
-                    let imgBlob = new Blob([ this.result ], { type: "image/jpeg" } );
-                    self.file = imgBlob;
-                };
-                reader.readAsArrayBuffer(file); // or the way you want to read it
-                console.log('dari kamera: ', file);
-                self.$f7.preloader.hide();
-              }, 
-              self.error); 
+    openGalleryWeb () {
+      document.getElementById('file-input').click()
+      this.$refs.actionsOneGroup.close()
+    },
+
+    // get photo from gallery
+    openGallery () {
+      if (navigator.camera) {
+        // Retrieve image file location from specified source
+        navigator.camera.getPicture(this.setPicture, this.error, {
+          quality: 80,
+          destinationType: Camera.DestinationType.FILE_URI,
+          sourceType: navigator.camera.PictureSourceType.SAVEDPHOTOALBUM
+        })
+      } else {
+        this.error
+      }
+    },
+
+    // Use the camera plugin to capture image
+    takePicture () {
+      if (navigator.camera) {
+        navigator.camera.getPicture(this.setPicture, this.error, {
+          quality: 80,
+          destinationType: Camera.DestinationType.FILE_URI,
+          sourceType: Camera.PictureSourceType.CAMERA,
+          mediaType: Camera.MediaType.PICTURE,
+          encodingType: Camera.EncodingType.JPEG,
+          cameraDirection: Camera.Direction.BACK,
+          targetWidth: 300,
+          targetHeight: 400
+        })
+      } else {
+        // If the navigator.camera is not available display generic error to the user.
+        this.error()
+      }
+    },
+
+    // Set the picture path in the data of the vue
+    // this action will automatically update the view.
+    setPicture (imagePath) {
+      let self = this
+      this.$f7.preloader.show()
+      this.imagePreview = imagePath
+      this.showPreview = false
+
+      window.resolveLocalFileSystemURL(imagePath,
+        function (fileEntry) {
+          // alert("got image file entry: " + fileEntry.fullPath);
+          // self.filename = fileEntry.fullPath.replace("/", "");
+          fileEntry.file(function (file) { // should return a raw HTML File Object
+            let reader = new FileReader()
+            reader.onloadend = function (e) {
+              let imgBlob = new Blob([ this.result ], { type: 'image/jpeg' })
+              self.file = imgBlob
+            }
+            reader.readAsArrayBuffer(file) // or the way you want to read it
+            console.log('dari kamera: ', file)
+            self.$f7.preloader.hide()
           },
-          this.error
-        );          
+          self.error)
         },
-        error(err){
-            if(navigator.notification){
-                navigator.notification.alert(err, this.default, "Error!");
-                this.$f7.dialog.close();
-            }else{
-                self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
-                this.$f7.dialog.close();
-                }
-        },
-        /*Handles a change on the file upload*/
-        handleFileUpload(){
-            this.$refs.actionsOneGroup.close();
-            let self = this;
-            /*Set the local file variable to what the user has selected.*/
-            this.file = this.$refs.file.files[0];
+        this.error
+      )
+    },
 
-            /*Initialize a File Reader object*/
-            var reader  = new FileReader();
+    error (err) {
+      if (navigator.notification) {
+        navigator.notification.alert(err, this.default, 'Error!')
+        this.$f7.dialog.close()
+      } else {
+        self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan')
+        this.$f7.dialog.close()
+      }
+    },
 
-            /*
+    /* Handles a change on the file upload */
+    handleFileUpload () {
+      this.$refs.actionsOneGroup.close()
+      let self = this
+      /* Set the local file variable to what the user has selected. */
+      this.file = this.$refs.file.files[0]
+
+      /* Initialize a File Reader object */
+      var reader = new FileReader()
+
+      /*
             Add an event listener to the reader that when the file
             has been loaded, we flag the show preview as true and set the
             image to be what was read from the reader.
             */
-            reader.addEventListener("load", function () {
-            this.showPreview = true;
-            this.imagePreview = reader.result;
-            //console.log(reader.result);
-            
-            this.filename = this.$refs.file.value.replace("C:\\fakepath\\", "");
-            }.bind(this), false);
-            
-            /*Check to see if the file is not empty.*/
-            if( this.file ){
-            /*Ensure the file is an image file.*/
-            if ( /\.(jpe?g|png|gif)$/i.test( this.file.name ) ) {
-                /*
+      reader.addEventListener('load', function () {
+        this.showPreview = true
+        this.imagePreview = reader.result
+        // console.log(reader.result);
+
+        this.filename = this.$refs.file.value.replace('C:\\fakepath\\', '')
+      }.bind(this), false)
+
+      /* Check to see if the file is not empty. */
+      if (this.file) {
+        /* Ensure the file is an image file. */
+        if (/\.(jpe?g|png|gif)$/i.test(this.file.name)) {
+          /*
                 Fire the readAsDataURL method which will read the file in and
                 upon completion fire a 'load' event which we will listen to and
                 display the image in the preview.
                 */
-                reader.readAsDataURL( this.file );
-                }
-            }
-        },
-        async formSubmit() {
-            if (document.getElementById('form').checkValidity() == false) {
-                this.$f7.input.validateInputs(document.getElementById('form'));
-            } else {
-                if (this.errorforce == true) {
-                    this.errorforce = false;
-                    
-                } else {                
-                    let formData = new FormData();
-
-                    /*Add the form data we need to submit*/
-                    formData.append('nama', this.nama);
-                    formData.append('alamat', this.alamat);
-                    formData.append('telp', this.telepon);
-                    formData.append('fotoUser', this.file);
-                    formData.append('tgl', this.tgl);
-                    formData.append('email', this.email);
-                    formData.append('pass', this.pass);
-
-                    // Display the key/value pairs
-                    for (var pair of formData.entries()) {
-                        console.log(pair[0]+ ': ' + pair[1]); 
-                    }
-                    
-                    try {
-                        let user = await axios().post('/user/register/', formData);
-                        console.log('SUCCESS!!', user.data);
-                        if (user.data.status == 500) {
-                            this.$f7.dialog.alert(user.data.values, 'Terjadi Kesalahan');
-                        } else {
-                            this.openToast('Berhasil melakukan registrasi'); 
-                            this.$f7router.navigate('/login/');
-                        }
-                    } catch (error) {
-                        console.log('ERROR!!', error);
-                        this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan'); 
-                    }
-                }
-            }
-        },
-        checkPass() {            
-            if (this.pass != this.confpass) {
-                this.errorforce = true;
-                this.err = "Password tidak sesuai"
-            } else {
-                this.errorforce = false;
-                this.err = "Konfirmasi Password harus diisi"
-            }
-        },
-        openToast(text) {
-            console.log(text);
-            
-            this.toastBottom = this.$f7.toast.create({
-                text: text,
-                closeTimeout: 3000,
-            });
-            
-            // Open it
-            this.toastBottom.open();
+          reader.readAsDataURL(this.file)
         }
+      }
+    },
+
+    async formSubmit () {
+      if (document.getElementById('form').checkValidity() == false) {
+        this.$f7.input.validateInputs(document.getElementById('form'))
+      } else {
+        if (this.errorforce == true) {
+          this.errorforce = false
+        } else {
+          let formData = new FormData()
+
+          /* Add the form data we need to submit */
+          formData.append('nama', this.nama)
+          formData.append('alamat', this.alamat)
+          formData.append('telp', this.telepon)
+          formData.append('fotoUser', this.file)
+          formData.append('tgl', this.tgl)
+          formData.append('username', this.username)
+          formData.append('email', this.email)
+          formData.append('pass', this.pass)
+
+          // Display the key/value pairs
+          for (var pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1])
+          }
+
+          try {
+            let user = await axios().post('/user/register/', formData)
+            console.log('SUCCESS!!', user.data)
+
+            this.openToast('Berhasil melakukan registrasi. Silahkan verifikasi email anda untuk login aplikasi')
+            this.$f7router.navigate('/login/')
+          } catch (error) {
+            console.log('ERROR!!', error.response)
+            this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan')
+          }
+        }
+      }
+    },
+
+    checkPass () {
+      if (this.pass != this.confpass) {
+        this.errorforce = true
+        this.err = 'Password tidak sesuai'
+      } else {
+        this.errorforce = false
+        this.err = 'Konfirmasi Password harus diisi'
+      }
+    },
+
+    openToast (text) {
+      console.log(text)
+
+      this.toastBottom = this.$f7.toast.create({
+        text: text,
+        closeTimeout: 3000
+      })
+
+      // Open it
+      this.toastBottom.open()
     }
+  }
 }
 </script>
 <style scoped>
