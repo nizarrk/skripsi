@@ -85,7 +85,7 @@
           <f7-list-item v-show="items.surveys_total == 0" link="/survey/" title="Survey Kepuasan">
             <f7-icon slot="media" md="material:assignment"></f7-icon>
           </f7-list-item>
-          <f7-list-item link="/kritik-saran/" title="Kritik dan Saran">
+          <f7-list-item v-show="items.critics_total == 0" link="/kritik-saran/" title="Kritik dan Saran">
             <f7-icon slot="media" md="material:textsms"></f7-icon>
           </f7-list-item>
         </f7-list>
@@ -113,6 +113,9 @@ export default {
 
       this.items = result.data.data
       console.log(result.data.data)
+
+      // Listen to Cordova's backbutton event
+      document.addEventListener('backbutton', this.navigateBack, false)
     } catch (error) {
       console.log(error.response)
       this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan')
@@ -128,7 +131,16 @@ export default {
 
         done()
       }, 1000)
-    }
+    },
+
+    navigateBack () {
+      let app = this.$f7
+      let $$ = this.$$
+      // Use Framework7's router to navigate back
+      let mainView = app.views.main
+
+      mainView.router.navigate('/home/')
+    },
   }
 }
 </script>

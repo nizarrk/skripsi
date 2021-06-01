@@ -39,7 +39,7 @@
       </f7-popup>
       <f7-card class="demo-facebook-card">
         <f7-card-header class="no-border">
-            <div class="demo-facebook-avatar"><img :src="baseURL + items.image" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"/></div>
+            <div class="demo-facebook-avatar"><img :src="baseURL + items.picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"/></div>
             <div class="demo-facebook-name">{{items.name}}</div>
             <div class="demo-facebook-date">{{formatTgl(items.created_at)}}</div>
         </f7-card-header>
@@ -59,13 +59,16 @@
             <span style="color: #8e8e93" v-show="items.category == 'Infrastruktur'"><f7-icon material="language" size="15px"></f7-icon><span> Infrastruktur</span></span>
             <span style="color: #8e8e93" v-show="items.category == 'Pengendalian Operasi'"><f7-icon material="directions_walk" size="15px"></f7-icon><span> Pengendalian Operasi</span></span>
             <span style="color: #8e8e93" v-show="items.category == 'Layanan'"><f7-icon material="people" size="15px"></f7-icon><span> Layanan</span></span><br>
-             <small style="color:red" v-show="items.status_lapor == 'Ditolak'">*{{items.pesan_tolak_lapor}}</small>
+            <small style="color:red" v-show="items.status == 3">*{{items.reject_note}}</small>
+            <small style="color:green" v-show="items.status == 1 && items.level_note == 0">*Kerusakan Ringan (1 - 3 Hari)</small>
+            <small style="color:green" v-show="items.status == 1 && items.level_note == 1">*Kerusakan Sedang (1 - 7 Hari)</small>
+            <small style="color:green" v-show="items.status == 1 && items.level_note == 2">*Kerusakan Berat (1 - 20 Hari)</small>
             <f7-row>
             <f7-col width="70">
               <p class="likes">Vote: {{items.votes_total}} &nbsp;&nbsp; Komentar: {{items.comments_total}}</p>
             </f7-col>
             <f7-col width="30">
-              <f7-chip v-if="items.status == 0" text="{Pending}" color="yellow"></f7-chip>
+              <f7-chip v-if="items.status == 0" text="Pending" color="yellow"></f7-chip>
               <f7-chip style="left: 25px;" v-else-if="items.status == 1" text="Proses" color="blue"></f7-chip>
               <f7-chip style="left: 25px;" v-else-if="items.status == 2" text="Selesai" color="green"></f7-chip>
               <f7-chip style="left: 25px;"  v-else text="Ditolak" color="red"></f7-chip>
@@ -96,7 +99,7 @@
           <f7-list media-list>
             <f7-list-item v-show="items.comments_id != null"
               :title="items.commentator_name"
-              :after="timeDifference(items.created_at)">
+              :after="timeDifference(items.comments_date)">
               <img slot="media" :src="baseURL + items.commentator_picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
               <span style="font-size: 13px; color: #8e8e93;">{{items.comments_desc}}</span>
             </f7-list-item>
@@ -104,7 +107,7 @@
               <center><span style="font-size: 13px; color: #8e8e93;">Tidak Ada Komentar.</span></center>
             </f7-list-item>
           </f7-list>
-          <f7-button v-show="items.comments_id != null" fill style="text-transform: capitalize;" :href="'/comments/' + items.report_id">Lihat Semua Komentar ({{items.comments_total}})</f7-button>
+          <f7-button v-show="items.comments_id != null" fill style="text-transform: capitalize;" :href="'/comments/' + items.id">Lihat Semua Komentar ({{items.comments_total}})</f7-button>
         </f7-block>
     </f7-page>
 </template>
@@ -152,7 +155,7 @@ export default {
       this.baseURL = baseURL.config.baseURL
       let decode = this.$jwt.decode(localStorage.getItem('token'))
       this.decoded = decode.userId
-      this.$f7.preloader.show()
+      this.$f7.preloader.show();
       let result = await axios().get('/report/user/' + this.id)
       this.$f7.preloader.hide()
       console.log(result.data.data)
@@ -162,10 +165,21 @@ export default {
       this.items = result.data.data
       this.desk = result.data.data.description
 
-      let url = this.baseURL + result.data.data.image
-      this.photo = url
-    } catch (error) {
+      let url = this.baseURL + result.data.data.image;
+      this.photo = url;
 
+      // add verified icon for admin
+      if (this.items.comentator_is_admin == 1) {
+        let html = `&nbsp<i data-v-31458a36="" class="icon material-icons color-blue" style="font-size: 18px;">verified_user</i>`
+        setTimeout(() => {
+          let selected = document.querySelector('div.item-title-row div.item-title');
+          selected.innerHTML += html
+        }, 500);
+      }
+    } catch (error) {
+        this.$f7.preloader.hide();
+        console.log(error.message);
+        this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan');
     }
   },
   methods: {

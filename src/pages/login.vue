@@ -1,7 +1,7 @@
 <template>
   <f7-page no-toolbar no-navbar no-swipeback login-screen>
-    <f7-login-screen-title><img style="width: 70%; margin-top: 30px;" src="../static/dishub.jpg" alt="logo"></f7-login-screen-title>
-    <f7-login-screen-title style="margin-top: -30px; font-size: 30px;">Selamat Datang</f7-login-screen-title>
+    <f7-login-screen-title><img style="width: 100%;" src="../static/siap_jalan_logo.png" alt="logo"></f7-login-screen-title>
+    <!-- <f7-login-screen-title style="margin-top: -30px; font-size: 30px;">Selamat Datang</f7-login-screen-title> -->
     <f7-list no-hairlines-md>
     <f7-list-input
         type="text"
@@ -34,12 +34,10 @@
       </f7-row>
       <!-- <f7-button style="text-transform:capitalize" href="/register/">Daftar Sekarang</f7-button> -->
     </f7-block>
-    <f7-block style="position: fixed; bottom: 0; left: 0 text-align: center; width: 100%;">
-      <f7-block-footer>
-        Belum punya akun?
-        <f7-link href="/register/">Daftar Sekarang</f7-link>
-      </f7-block-footer>
-    </f7-block>
+    <f7-block-footer style="margin-top:50px;">
+      Belum punya akun?
+      <f7-link href="/register/">Daftar Sekarang</f7-link>
+    </f7-block-footer>
   </f7-page>
 </template>
 

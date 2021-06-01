@@ -1,7 +1,7 @@
 {
-  "name": "app-skripsi",
+  "name": "lapor-apps",
   "version": "1.0.0",
-  "description": "Aplikasi Skripsi",
+  "description": "Aplikasi Lapor Dishub",
   "author": "Nizar <niezar.rk@gmail.com>",
   "private": true,
   "scripts": {
@@ -115,7 +115,7 @@
       "cordova-plugin-web-share": {},
       "cordova-plugin-splashscreen": {},
       "cordova-plugin-customurlscheme": {
-        "URL_SCHEME": "dishub-lapor"
+        "URL_SCHEME": "siapjalan"
       }
     },
     "platforms": [

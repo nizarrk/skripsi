@@ -42,7 +42,7 @@
             <f7-col>
               <div>
                 <label>
-                  <input type="radio" name="kat" v-model="kat" value="PJU">
+                  <input type="radio" name="kat" v-model="kat" value="Penerangan Jalan Umum PJU">
                   <f7-icon material="lightbulb" f7="lightbulb" size="35px"></f7-icon>
                 </label>
               </div>
@@ -81,7 +81,7 @@
               <div>
                 <label>
                   <input type="radio" name="kat" v-model="kat" value="Cermin Tikungan">
-                  <f7-icon material="directions" size="35px"></f7-icon>
+                  <f7-icon f7="circle" size="35px"></f7-icon>
                 </label>
               </div>
               <span>Cermin Tikungan</span>
@@ -90,7 +90,7 @@
               <div>
                 <label>
                   <input type="radio" name="kat" v-model="kat" value="Perlengkapan Jalan Lainnya">
-                  <f7-icon material="more" size="35px"></f7-icon>
+                  <f7-icon material="more_horiz" size="35px"></f7-icon>
                 </label>
               </div>
               <span>Perlengkapan Jalan Lainnya</span>
@@ -98,7 +98,16 @@
           </f7-row>
         </center>
       </f7-block>
-      <f7-block-title>Lokasi</f7-block-title>
+      <f7-block-title>Lokasi <f7-icon tooltip="Silahkan isi lokasi dengan text alamat ATAU dengan peta" tooltip-trigger="hover" material="info"></f7-icon></f7-block-title>
+      <f7-block>
+        <f7-input
+          type="textarea"
+          placeholder="Misal: Jalan Pahlawan Mojokerto"
+          :value="address"
+          :disabled="showPreview == false"
+          @blur="getLocationLatLng($event.target.value)"
+        />
+      </f7-block>
       <f7-block>
         <l-map style="height: 200px;" id="map" ref="myMap" :zoom="zoom" :center="center" @click="addMarker">
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
@@ -110,7 +119,7 @@
             <l-popup>{{address}}</l-popup>
           </l-marker>
         </l-map>
-        <span style="color: #8e8e93"><f7-icon v-show="address != null" md="material:place"></f7-icon><span style="font-size:12px;">{{address}}</span></span>
+        <!-- <span style="color: #8e8e93"><f7-icon v-show="address != null" md="material:place"></f7-icon><span style="font-size:12px;">{{address}}</span></span> -->
       </f7-block>
       <f7-block-title>Deskripsi</f7-block-title>
       <f7-block>
@@ -159,8 +168,11 @@ export default {
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       marker: L.latLng(0, 0),
-      address: null,
-      district: null,
+      address: '',
+      district: '',
+
+      //geocoder
+      reverse: false,
 
       // user
       idUser: '',
@@ -188,10 +200,13 @@ export default {
     }
   },
   created () {
-    let decode = this.$jwt.decode()
-    this.idUser = decode.userId
+    let decode = this.$jwt.decode();
+    this.idUser = decode.id;
     // Listen to Cordova's backbutton event
-    document.addEventListener('backbutton', this.navigateBack, false)
+    document.addEventListener('backbutton', this.navigateBack, false);
+
+    this.openToast('Aktifkan pengaturan lokasi pada setting kamera perangkat anda untuk pengalaman lebih baik');
+    // this.$f7.dialog.alert('Silahkan mengaktifkan Location Tag pada setting kamera perangkat anda untuk pengalaman lebih baik', 'Perhatian');
   },
   methods: {
     navigateBack () {
@@ -285,15 +300,17 @@ export default {
       )
     },
     error (err) {
-      self.$f7.dialog.alert(error.message, 'Terjadi Kesalahan')
+      self.$f7.dialog.alert(err.message, 'Terjadi Kesalahan')
       this.$f7.dialog.close()
     },
     /* Submits the file to the server */
     async submitFile () {
       try {
+        this.$f7.preloader.show();
         let self = this
 
-        if (this.kat == '' || this.file == '' || this.desk == '' || this.address == null) {
+        if (this.kat == '' || this.file == '' || this.desk == '' || this.address == '' || this.lat == null || this.lng == null) {
+          this.$f7.preloader.hide();
           self.$f7.dialog.alert('Pengisian laporan keluhan tidak lengkap', 'Terjadi Kesalahan')
         } else {
           console.log(this.file)
@@ -317,7 +334,7 @@ export default {
           }
 
           /* Make the request to the POST /single-file URL */
-          let result = await axios().post('/report/add', formData)
+          let result = await axios().post('/report/add', formData);
 
           // get all admin
           let admins = await axios().get('/user/admin')
@@ -333,10 +350,12 @@ export default {
             })
           };
           this.openToast('Berhasil menambahkan laporan keluhan')
+          this.$f7.preloader.hide();
           this.$f7router.navigate('/home/')
           console.log(result.data)
         }
       } catch (error) {
+        this.$f7.preloader.hide();
         console.log('FAILURE!!', error.response)
         this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan')
       }
@@ -385,7 +404,7 @@ export default {
         console.log(this.exifdata)
         self.metadata = this.exifdata
 
-        axios().post('/report/geocode', this.exifdata)
+        axios().post('/report/geocode/reverse', this.exifdata)
           .then(function (response) {
             console.log(response.data)
 
@@ -416,6 +435,35 @@ export default {
           })
       })
     },
+    async getLocationLatLng(text) {
+      try {
+        console.log(text);
+        let isMojokerto = text.toLowerCase().includes('mojokerto');
+
+        if (!isMojokerto) text += ' mojokerto'
+
+        let geocode = await axios().post('/report/geocode', {
+          lokasi: text
+        });
+
+        this.lat = geocode.data.data.DisplayPosition.Latitude;
+        this.lng = geocode.data.data.DisplayPosition.Longitude;
+
+        this.marker = L.latLng(this.lat, this.lng)
+        this.center = L.latLng(this.lat, this.lng)
+        this.address = geocode.data.data.Address.Label;
+        this.district = geocode.data.data.Address.District;
+      } catch (error) {
+        console.log(error);
+        this.openToast(error.response.data.message);
+
+        this.lat = null;
+        this.lng = null;
+        this.marker = L.latLng(0, 0);
+        this.address = text
+        this.district = null;
+      }
+    },
     removeMarker () {
       // this.markers.splice(index, 1);
     },
@@ -423,7 +471,7 @@ export default {
       try {
         if (this.err == true) {
           this.$f7.preloader.show()
-          let response = await axios().post('/report/geocode', {
+          let response = await axios().post('/report/geocode/reverse', {
             lat: e.latlng.lat,
             lng: e.latlng.lng
           })
@@ -439,6 +487,8 @@ export default {
           this.district = response.data.data.items[0].address.district
           this.$f7.preloader.hide()
           // this.marker = e.latlng;
+        } else if (this.showPreview == false) {
+          this.openToast('Belum ada foto terpilih')
         } else {
           this.openToast('Foto telah memiliki data lokasi')
         }

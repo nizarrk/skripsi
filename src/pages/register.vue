@@ -7,7 +7,7 @@
     </f7-navbar>
     <f7-block>
         <center>
-            <img style="border-radius:50px; max-width: 100px;"
+            <img style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;"
             :src="imagePreview" /><br>
             <span>{{filename}}</span>
             <!-- <f7-link style="margin-left:-20px;" href="#"><f7-icon ios="f7:camera" md="material:camera_alt" size="34px"></f7-icon></f7-link> -->
@@ -302,20 +302,22 @@ export default {
       if (document.getElementById('form').checkValidity() == false) {
         this.$f7.input.validateInputs(document.getElementById('form'))
       } else {
+        this.$f7.preloader.show();
         if (this.errorforce == true) {
           this.errorforce = false
         } else {
-          let formData = new FormData()
+          let formData = new FormData();
 
           /* Add the form data we need to submit */
-          formData.append('nama', this.nama)
-          formData.append('alamat', this.alamat)
-          formData.append('telp', this.telepon)
-          formData.append('fotoUser', this.file)
-          formData.append('tgl', this.tgl)
-          formData.append('username', this.username)
-          formData.append('email', this.email)
-          formData.append('pass', this.pass)
+          formData.append('nama', this.nama);
+          formData.append('alamat', this.alamat);
+          formData.append('telp', this.telepon);
+          formData.append('fotoUser', this.file);
+          formData.append('gender', this.gender);
+          formData.append('tgl', this.tgl);
+          formData.append('username', this.username);
+          formData.append('email', this.email);
+          formData.append('pass', this.pass);
 
           // Display the key/value pairs
           for (var pair of formData.entries()) {
@@ -326,9 +328,11 @@ export default {
             let user = await axios().post('/user/register/', formData)
             console.log('SUCCESS!!', user.data)
 
+            this.$f7.preloader.hide();
             this.openToast('Berhasil melakukan registrasi. Silahkan verifikasi email anda untuk login aplikasi')
             this.$f7router.navigate('/login/')
           } catch (error) {
+            this.$f7.preloader.hide();
             console.log('ERROR!!', error.response)
             this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan')
           }

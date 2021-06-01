@@ -1,5 +1,5 @@
 <template>
-  <f7-page ptr @ptr:refresh="pullToRefresh" :page-content="true">
+  <f7-page ptr @ptr:refresh="pullToRefresh" infinite :infinite-distance="50" :infinite-preloader="showPreloader" @infinite="loadMore" :page-content="true">
     <f7-navbar>
       <f7-nav-title>Beranda</f7-nav-title>
       <f7-nav-left>
@@ -42,7 +42,7 @@
           <p class="likes">Vote: {{item.total_vote}} &nbsp;&nbsp; Komentar: {{item.total_comments}}</p>
         </f7-col>
         <f7-col width="30">
-          <f7-chip v-if="item.status == 0" text="Pending" color="orange" style="float: right;"></f7-chip>
+          <f7-chip v-if="item.status == 0" text="Pending" color="yellow" style="float: right;"></f7-chip>
           <f7-chip v-else-if="item.status == 1" text="Proses" color="blue" style="float: right;"></f7-chip>
           <f7-chip v-else-if="item.status == 2" text="Selesai" color="green" style="float: right;"></f7-chip>
           <f7-chip v-else text="Ditolak" color="red"></f7-chip>
@@ -54,7 +54,7 @@
             <f7-link v-if="item.has_voted > 0" style="color: #2999F3; margin-left: 20px;" @click="deleteVote(item.votes_id)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
             <f7-link v-else @click="vote(item.id)" style="margin-left: 20px;"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
             <f7-link :href="'/comments/' + item.id"><f7-icon material="comment" size="20px"></f7-icon> Komentar</f7-link>
-            <f7-link @click="share" style="margin-right: 20px;"><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
+            <f7-link @click="share(item)" style="margin-right: 20px;"><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
         <!-- <f7-row>
           <f7-col style="padding-left: 50px;">
             <f7-link v-if="item.has_voted == 1" style="color: #2999F3" @click="deleteVote(item.votes_id)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
@@ -69,6 +69,9 @@
         </f7-row> -->
       </f7-card-footer>
     </f7-card>
+    <center>
+      <f7-preloader v-show="showPreloader" style="margin-top: 30px;"></f7-preloader>
+    </center>
   </f7-page>
 </template>
 <script>
@@ -84,21 +87,38 @@ export default {
       items: [],
       state: '',
       lastTimeBackPress: 0,
-      timePeriodToExit: 2000
+      timePeriodToExit: 2000,
+
+      // infinite scroll
+      total: 0,
+      page: 1, // pagination
+      allowInfinite: true,
+      showPreloader: false
     }
   },
   async created () {
     try {
+      console.log(this.$f7.views.main);
       // Listen to Cordova's backbutton event
       document.addEventListener('backbutton', this.navigateBack, false)
       this.$f7.preloader.show()
       let baseURL = await axios().request()
       this.baseURL = baseURL.config.baseURL
-      let result = await axios().get('/report/home')
+      let result = await axios().get('/report/home?limit=20&page=1')
       this.$f7.preloader.hide()
       console.log(result.data.data)
 
-      this.items = result.data.data
+      this.page = result.data.data.nextPage;
+      this.items = result.data.data.data;
+      this.total = result.data.data.total;
+
+
+      // to turn off pagination preloader if this page is last page
+      if (this.page == null) {
+        this.showPreloader = false;
+      } else {
+        this.showPreloader = true;
+      }
     } catch (error) {
       console.log(error.response)
       this.$f7.preloader.hide()
@@ -126,7 +146,7 @@ export default {
       let app = this.$f7
       // Use Framework7's router to navigate back
       let mainView = app.views.main
-      if (app.views.main.router.url == '/home/') {
+      if (mainView.router.url == '/home/') {
         if (new Date().getTime() - this.lastTimeBackPress < this.timePeriodToExit) {
           navigator.app.exitApp()
         } else {
@@ -142,30 +162,74 @@ export default {
         }
       }
     },
-    share () {
+    share (item) {
       if (navigator.share) {
         navigator.share({
-          title: 'Share topic',
-          text: 'Share message',
-          url: 'Share url'
+          title: item.code,
+          text: item.description,
+          url: 'http://localhost:8081/redirect'
         }).then(() => {
-          console.log('Data was shared successfully')
+          console.log('Data was shared successfully');
+          this.toastBottom = this.$f7.toast.create({
+            text: 'Berhasil membagikan laporan',
+            closeTimeout: 2000
+          })
+
+          // Open it
+          this.toastBottom.open()
         }).catch((err) => {
           console.error('Share failed:', err.message)
         })
-      } else {
-        alert('hai')
       }
     },
     async pullToRefresh (event, done) {
       let self = this
 
       setTimeout(async () => {
-        let result = await axios().get('/report/home')
-        self.items = result.data.data
+        let result = await axios().get('/report/home?limit=20&page=1');
+
+        self.page = result.data.data.nextPage;
+        self.items = result.data.data.data;
+        self.total = result.data.data.total;
+
+
+      // to turn off pagination preloader if this page is last page
+      if (this.page == null) {
+        this.showPreloader = false;
+      } else {
+        this.showPreloader = true;
+      }
 
         done()
       }, 1000)
+    },
+    loadMore() {
+      console.log('masuk loadmore');
+      console.log(this.items);
+      const self = this;
+      if (!self.allowInfinite) return;
+      self.allowInfinite = false;
+
+      setTimeout(async () => {
+        if (self.items.length >= self.total) {
+          self.showPreloader = false;
+          return;
+        }
+
+        let result = await axios().get(`/report/home?limit=20&page=${self.page}`);
+
+        self.page = result.data.data.nextPage;
+        
+        // for (let i = 0; i >= result.data.data.data.length; i++) {
+        //     self.items.push(result.data.data.data[i]);
+        // }
+
+        result.data.data.data.forEach(x => {
+          self.items.push(x);
+        });
+
+        self.allowInfinite = true;
+      }, 1000);
     },
     async vote (id) {
       try {
@@ -173,7 +237,7 @@ export default {
           idlapor: id
         })
         console.log('tambah vote', vote)
-        this.state = 'tambah'
+        this.state = 'tambah vote' + new Date().getTime() // time buat pembeda
       } catch (error) {
         console.log(error.message)
       }
@@ -182,7 +246,7 @@ export default {
       try {
         let vote = await axios().delete('/report/vote/remove/' + id)
         console.log('delete vote', vote)
-        this.state = 'hapus'
+        this.state = 'hapus vote' + new Date().getTime() // time buat pembeda
       } catch (error) {
         console.log(error.message)
       }
@@ -192,8 +256,9 @@ export default {
     state: {
       async handler () {
         console.log(this.state)
-        let result = await axios().get('/report/home')
-        this.items = result.data.data
+        let limit = this.items.length;
+        let result = await axios().get(`/report/home?limit=${this.page > 1 ? limit : 20}&page=1`)
+        this.items = result.data.data.data
       }
     }
   },
@@ -250,7 +315,7 @@ export default {
   bottom: 85px;
   left: 10px;
   margin-right: 10px;
-  width: 98%;
+  width: 95%;
   color: white;
   background: rgba(0, 0, 0, 0.65);
 

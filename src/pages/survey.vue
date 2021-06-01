@@ -7,7 +7,7 @@
         </f7-navbar>
             <f7-block strong v-for="(item, index) in items" :key="index">
                 <span>{{index + 1}}.</span>
-                <span>{{item.pertanyaan_survey}}</span>
+                <span>{{item.question}}</span>
                 <div style="margin-top:10px;">
                     <f7-row>
                         <f7-col>
@@ -66,26 +66,26 @@ export default {
   async created () {
     try {
       // Listen to Cordova's backbutton event
-      document.addEventListener('backbutton', this.navigateBack, false)
-      let baseURL = await axios().request()
-      this.baseURL = baseURL.config.baseURL
-      this.$f7.preloader.show()
-      let result = await axios().get('/survey/list')
-      this.$f7.preloader.hide()
-      // console.log(result.data.values);
+      document.addEventListener('backbutton', this.navigateBack, false);
+      let baseURL = await axios().request();
+      this.baseURL = baseURL.config.baseURL;
+      this.$f7.preloader.show();
+      let result = await axios().get('/survey/get');
+      this.$f7.preloader.hide();
+      console.log(result.data.data);
 
-      result.data.values.map((e, i) => {
+      result.data.data.map((e, i) => {
         this.form.push({
-          soal: e.id_pertanyaan_survey,
+          soal: e.id,
           jwb: null
         })
       })
 
-      this.items = result.data.values
-      console.log(result.data)
+      this.items = result.data.data;
     } catch (error) {
-      console.log(error.message)
-      this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan')
+      console.log(error.response);
+      this.$f7.preloader.hide();
+      this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan')
     }
   },
   methods: {
@@ -116,15 +116,16 @@ export default {
             })
           })
 
-          this.$f7.preloader.hide()
+          this.$f7.preloader.hide();
           this.openToast('Berhasil mengisi data survey')
           this.$f7router.back('', {
             force: true
           })
         }
       } catch (error) {
-        console.log(error.message)
-        this.$f7.dialog.alert(error.message, 'Terjadi Kesalahan')
+        console.log(error.response);
+        this.$f7.preloader.hide();
+        this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan');
       }
     },
     openToast (text) {
@@ -133,14 +134,14 @@ export default {
       this.toastBottom = this.$f7.toast.create({
         text: text,
         closeTimeout: 3000
-      })
+      });
 
       // Open it
-      this.toastBottom.open()
+      this.toastBottom.open();
     }
   },
   beforeDestroy () {
-    document.removeEventListener('backbutton', this.navigateBack)
+    document.removeEventListener('backbutton', this.navigateBack);
   }
 }
 </script>

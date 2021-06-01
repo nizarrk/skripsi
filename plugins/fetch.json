@@ -66,11 +66,11 @@
   "cordova-plugin-customurlscheme": {
     "source": {
       "type": "registry",
-      "id": "cordova-plugin-customurlscheme@^5.0.2"
+      "id": "cordova-plugin-customurlscheme"
     },
     "is_top_level": true,
     "variables": {
-      "URL_SCHEME": "dishub-lapor"
+      "URL_SCHEME": "lapordishub"
     }
   }
 }

@@ -68,14 +68,14 @@
                 label="Jenis Kelamnin"
                 name="gender"
                 type="select"
-                defaultValue="Laki-laki"
+                defaultValue="1"
                 placeholder="-Pilih-"
                 @input="gender = $event.target.value"
                 required
                 validate
             >
-                <option value="Laki-laki">Laki-laki</option>
-                <option value="Perempuan">Perempuan</option>
+                <option value="1">Laki-laki</option>
+                <option value="2">Perempuan</option>
             </f7-list-input>
 
             <f7-list-input
@@ -141,7 +141,7 @@ export default {
       nama: null,
       alamat: null,
       telepon: null,
-      gender: 'Laki-laki',
+      gender: 1,
       tgl: null,
       username: null,
       email: null,
@@ -309,6 +309,7 @@ export default {
       if (document.getElementById('form').checkValidity() == false) {
         this.$f7.input.validateInputs(document.getElementById('form'))
       } else {
+        this.$f7.preloader.show();
         let formData = new FormData()
 
         /* Add the form data we need to submit */
@@ -331,11 +332,13 @@ export default {
           let user = await axios().put('/user/edit', formData)
           console.log('SUCCESS!!', user.data)
 
+          this.$f7.preloader.hide();
           this.openToast('Berhasil mengubah data profil')
           this.$f7router.back('/home/tab5/', {
             force: true
           })
         } catch (error) {
+          this.$f7.preloader.hide();
           console.log('ERROR!!', error.response)
           this.$f7.dialog.alert(error.response.data.message, 'Terjadi Kesalahan')
         }

@@ -5,11 +5,12 @@
       <!-- <f7-messages-title><b>Sunday, Feb 9,</b> 12:58</f7-messages-title> -->
       <f7-message
         v-for="(message, index) in items"
+        :class="message.user.is_admin == 1 ? 'is_admin' : null"
         :id="message.id"
         :key="index"
-        :type="message.user_id == user ? 'sent' : 'received'"
+        :type="message.type"
         :text-header="timeDifference(message.created_at)"
-        :name="message.user.name"
+        :name="message.user_id !== user ? message.user.name : ''"
         :avatar="baseURL + message.user.picture"
         :first="isFirstMessage(message, index)"
         :last="isLastMessage(message, index)"
@@ -68,21 +69,42 @@ export default {
   },
   async created () {
     try {
+      let decode = this.$jwt.decode(localStorage.getItem('token'))
+
       this.$f7.preloader.show()
       let baseURL = await axios().request()
       this.baseURL = baseURL.config.baseURL
-      let result = await axios().get('/comment/' + this.id)
+      let result = await axios().get('/comment/' + this.id);
+      this.user = decode.id;
+
+      let messageData = await Promise.all(result.data.data.map(x => {
+        x.type = x.user_id == this.user ? 'sent' : 'received';
+        return x;
+      }))
+
+      console.log(messageData);
+      this.items = messageData;
+
       this.$f7.preloader.hide()
-      console.log(result.data.data)
-      this.items = result.data.data
-      let decode = this.$jwt.decode(localStorage.getItem('token'))
-      console.log(decode)
-      this.user = decode.id
-      this.userlapor = result.data.data[0].report.user_id
+      // console.log(result.data.data)      
+      this.userlapor = result.data.data[0].user_id
       this.kodelapor = result.data.data[0].report.code
       this.idlapor = result.data.data[0].report_id
 
       console.log(this.user + '=' + this.userlapor)
+
+      // add verified icon for admin
+      let html = `&nbsp<i data-v-31458a36="" class="icon material-icons color-blue" style="font-size: 14px;">verified_user</i>`
+      setTimeout(() => {
+        let selected = document.querySelectorAll('div.is_admin div.message-name');
+        
+        selected.forEach(x => {
+          x.innerHTML += html
+        });
+      }, 200);
+
+      // Listen to Cordova's backbutton event
+      document.addEventListener('backbutton', this.navigateBack, false)
     } catch (error) {
       console.log(error)
       this.$f7.preloader.hide()
@@ -90,6 +112,19 @@ export default {
     }
   },
   methods: {
+    navigateBack () {
+      let app = this.$f7
+      let $$ = this.$$
+      // Use Framework7's router to navigate back
+      let mainView = app.views.main
+      if (app.views.main.router.url == '/home/tab1') {
+        navigator.app.exitApp()
+      } else {
+        mainView.router.back('', {
+          force: true
+        })
+      }
+    },
     async postComment () {
       try {
         if (this.msg == '') {
@@ -109,7 +144,7 @@ export default {
 
             if (this.user !== this.userlapor) {
               let notif = await axios().post('/notification/add', {
-                user_id: this.userlapor,
+                recipient_id: this.userlapor,
                 report_id: this.idlapor,
                 type: 'Komentar',
                 desc: `Anda mendapat komentar baru pada laporan ${this.kodelapor}`
@@ -170,22 +205,32 @@ export default {
       }
     },
     isFirstMessage (message, index) {
-      const self = this
-      const previousMessage = self.items[index - 1]
-      if (!previousMessage || previousMessage.name !== message.name) return true
-      return false
+      const self = this;
+      const previousMessage = self.items[index - 1];
+      if (message.isTitle) return false;
+      if (
+        !previousMessage ||
+        previousMessage.type !== message.type ||
+        previousMessage.name !== message.name
+      ) 
+        return true;
+      return false;
     },
     isLastMessage (message, index) {
-      const self = this
-      const nextMessage = self.items[index + 1]
-      if (!nextMessage || nextMessage.name !== message.name) return true
-      return false
+      const self = this;
+      const nextMessage = self.items[index + 1];
+      if (message.isTitle) return false;
+      if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name)
+        return true;
+      return false;
     },
     isTailMessage (message, index) {
-      const self = this
-      const nextMessage = self.items[index + 1]
-      if (!nextMessage || nextMessage.name !== message.name) return true
-      return false
+      const self = this;
+      const nextMessage = self.items[index + 1];
+      if (message.isTitle) return false;
+      if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name)
+        return true;
+      return false;
     },
     showToast (text) {
       this.toastCenter = this.$f7.toast.create({
