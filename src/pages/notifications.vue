@@ -2,39 +2,39 @@
   <f7-page infinite :infinite-distance="50" :infinite-preloader="showPreloader" @infinite="loadMore" :page-content="true">
     <f7-navbar title="Notifikasi"></f7-navbar>
     <div v-if="items.length > 0" class="list media-list">
-  <ul>
-    <li v-for="(item, index) in items" :key="index" :style="item.status == 0 ? 'background-color:#E5E9F2' : ''">
-      <a v-if="item.type == 'Komentar'" :href="'/comments/'+item.report_id" class="item-link item-content" @click="updateStatus(item.id)">
-        <div class="item-inner">
-          <div class="item-title-row">
-            <div class="item-title"><b>{{item.type}}</b></div>
-            <div class="item-after">{{timeDifference(item.created_at)}}</div>
-          </div>
-          <div class="item-subtitle">Komentar baru dari <b>{{item.originator.name}}</b></div>
-          <div class="item-text">{{item.description}}</div>
-        </div>
-      </a>
-      <a v-else-if="item.type == 'Laporan Keluhan'" :href="'/report-detail/'+item.report_id" class="item-link item-content" @click="updateStatus(item.id)">
-        <div class="item-inner">
-          <div class="item-title-row">
-            <div class="item-title"><b>{{item.type}}</b></div>
-            <div class="item-after">{{timeDifference(item.created_at)}}</div>
-          </div>
-          <div class="item-subtitle">Pemberitahuan baru dari <b>{{item.originator.name}}</b></div>
-          <div class="item-text">{{item.description}}</div>
-        </div>
-      </a>
-    </li>
-    <!-- <div class="preloader infinite-scroll-preloader"></div> -->
-    <!-- <f7-button v-show="all == false" @click="showAll">Lihat Semua</f7-button> -->
-  </ul>
-    <center>
-      <f7-preloader v-show="showPreloader" style="margin-top: 30px;"></f7-preloader>
-    </center>
-</div>
-<div v-else style="padding-top: 300px;">
-  <center><span style="font-size: 17px; color: #8e8e93;">Tidak Ada Notifikasi Baru.</span></center>
-</div>
+      <ul>
+        <li v-for="(item, index) in items" :key="index" :style="item.status == 0 ? 'background-color:#E5E9F2' : ''">
+          <a v-if="item.type == 'Komentar'" :href="'/comments/'+item.report_id" class="item-link item-content" @click="updateStatus(item.id)">
+            <div class="item-inner">
+              <div class="item-title-row">
+                <div class="item-title"><b>{{item.type}}</b></div>
+                <div class="item-after">{{timeDifference(item.created_at)}}</div>
+              </div>
+              <div class="item-subtitle">Komentar baru dari <b>{{item.originator.name}}</b></div>
+              <div class="item-text">{{item.description}}</div>
+            </div>
+          </a>
+          <a v-else-if="item.type == 'Laporan Keluhan'" :href="'/report-detail/'+item.report_id" class="item-link item-content" @click="updateStatus(item.id)">
+            <div class="item-inner">
+              <div class="item-title-row">
+                <div class="item-title"><b>{{item.type}}</b></div>
+                <div class="item-after">{{timeDifference(item.created_at)}}</div>
+              </div>
+              <div class="item-subtitle">Pemberitahuan baru dari <b>{{item.originator.name}}</b></div>
+              <div class="item-text">{{item.description}}</div>
+            </div>
+          </a>
+        </li>
+        <!-- <div class="preloader infinite-scroll-preloader"></div> -->
+        <!-- <f7-button v-show="all == false" @click="showAll">Lihat Semua</f7-button> -->
+      </ul>
+      <center>
+        <f7-preloader v-show="showPreloader" style="margin-top: 30px;"></f7-preloader>
+      </center>
+    </div>
+    <div v-else style="padding-top: 300px;">
+      <center><span style="font-size: 17px; color: #8e8e93;">Tidak Ada Notifikasi Baru.</span></center>
+    </div>
 <!-- <f7-list media-list>
   <f7-list-item
     v-for="(item, index) in items"

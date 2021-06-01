@@ -15,63 +15,69 @@
         search-in=".item-title"
       ></f7-searchbar> -->
     </f7-navbar>
-    <f7-card class="demo-facebook-card" v-for="(item, index) in items" :key="index">
-      <f7-card-header class="no-border" :laporid="item.id">
-        <div class="demo-facebook-avatar">
-          <img :src="baseURL + item.picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"/>
-        </div>
-        <div class="demo-facebook-name">{{item.name}}</div>
-        <div class="demo-facebook-date">{{timeDifference(item.created_at)}}</div>
-      </f7-card-header>
-      <f7-card-content>
-        <p>{{item.description | limitToDisplay(item.description)}}</p>
-        <a :href="'/report-detail/' + item.id">
-        <img :src="baseURL + item.image" style="width: 100%; height: 300px; object-fit: cover;"/>
-        <div class="text-block">
-          <span style="font-size: 13px;"><f7-icon md="material:place" size="15px"></f7-icon>{{item.location}}</span>
-        </div>
-        <span style="color: #8e8e93" v-show="item.category == 'Angkutan Umum'"><f7-icon material="directions_bus" size="15px"></f7-icon><span> Angkutan Umum</span></span>
-        <span style="color: #8e8e93" v-show="item.category == 'Lalu Lintas'"><f7-icon material="traffic" size="15px"></f7-icon><span> Lalu Lintas</span></span>
-        <span style="color: #8e8e93" v-show="item.category == 'Perparkiran'"><f7-icon material="local_parking" size="15px"></f7-icon><span> Perparkiran</span></span>
-        <span style="color: #8e8e93" v-show="item.category == 'Infrastruktur'"><f7-icon material="language" size="15px"></f7-icon><span> Infrastruktur</span></span>
-        <span style="color: #8e8e93" v-show="item.category == 'Pengendalian Operasi'"><f7-icon material="directions_walk" size="15px"></f7-icon><span> Pengendalian Operasi</span></span>
-        <span style="color: #8e8e93" v-show="item.category == 'Layanan'"><f7-icon material="people" size="15px"></f7-icon><span> Layanan</span></span><br>
+      <div v-show="total !== 0 && hasLoaded == true">
+        <f7-card class="demo-facebook-card" v-for="(item, index) in items" :key="index">
+          <f7-card-header class="no-border" :laporid="item.id">
+            <div class="demo-facebook-avatar">
+              <img :src="baseURL + item.picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"/>
+            </div>
+            <div class="demo-facebook-name">{{item.name}}</div>
+            <div class="demo-facebook-date">{{timeDifference(item.created_at)}}</div>
+          </f7-card-header>
+          <f7-card-content>
+            <p>{{item.description | limitToDisplay(item.description)}}</p>
+            <a :href="'/report-detail/' + item.id">
+              <img :src="baseURL + item.image" style="width: 100%; height: 300px; object-fit: cover;"/>
+              <div class="text-block">
+                <span style="font-size: 13px;"><f7-icon md="material:place" size="15px"></f7-icon>{{item.location}}</span>
+              </div>
+              
+              <span style="color: #8e8e93" v-show="item.category == 'Angkutan Umum'"><f7-icon material="directions_bus" size="15px"></f7-icon><span> Angkutan Umum</span></span>
+              <span style="color: #8e8e93" v-show="item.category == 'Lalu Lintas'"><f7-icon material="traffic" size="15px"></f7-icon><span> Lalu Lintas</span></span>
+              <span style="color: #8e8e93" v-show="item.category == 'Perparkiran'"><f7-icon material="local_parking" size="15px"></f7-icon><span> Perparkiran</span></span>
+              <span style="color: #8e8e93" v-show="item.category == 'Infrastruktur'"><f7-icon material="language" size="15px"></f7-icon><span> Infrastruktur</span></span>
+              <span style="color: #8e8e93" v-show="item.category == 'Pengendalian Operasi'"><f7-icon material="directions_walk" size="15px"></f7-icon><span> Pengendalian Operasi</span></span>
+              <span style="color: #8e8e93" v-show="item.category == 'Layanan'"><f7-icon material="people" size="15px"></f7-icon><span> Layanan</span></span><br>
 
-        <f7-row>
-        <f7-col width="70">
-          <p class="likes">Vote: {{item.total_vote}} &nbsp;&nbsp; Komentar: {{item.total_comments}}</p>
-        </f7-col>
-        <f7-col width="30">
-          <f7-chip v-if="item.status == 0" text="Pending" color="yellow" style="float: right;"></f7-chip>
-          <f7-chip v-else-if="item.status == 1" text="Proses" color="blue" style="float: right;"></f7-chip>
-          <f7-chip v-else-if="item.status == 2" text="Selesai" color="green" style="float: right;"></f7-chip>
-          <f7-chip v-else text="Ditolak" color="red"></f7-chip>
-        </f7-col>
-      </f7-row>
-        </a>
-      </f7-card-content>
-      <f7-card-footer class="no-border">
-            <f7-link v-if="item.has_voted > 0" style="color: #2999F3; margin-left: 20px;" @click="deleteVote(item.votes_id)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
-            <f7-link v-else @click="vote(item.id)" style="margin-left: 20px;"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
-            <f7-link :href="'/comments/' + item.id"><f7-icon material="comment" size="20px"></f7-icon> Komentar</f7-link>
-            <f7-link @click="share(item)" style="margin-right: 20px;"><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
-        <!-- <f7-row>
-          <f7-col style="padding-left: 50px;">
-            <f7-link v-if="item.has_voted == 1" style="color: #2999F3" @click="deleteVote(item.votes_id)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
-            <f7-link v-else @click="vote(item.id)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
-          </f7-col>
-          <f7-col style="padding-left: 50px;">
-            <f7-link :href="'/comments/' + item.id"><f7-icon material="comment" size="20px"></f7-icon> Komentar</f7-link>
-          </f7-col>
-          <f7-col>
-            <f7-link @click="share"><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
-          </f7-col>
-        </f7-row> -->
-      </f7-card-footer>
-    </f7-card>
-    <center>
-      <f7-preloader v-show="showPreloader" style="margin-top: 30px;"></f7-preloader>
-    </center>
+              <f7-row>
+                <f7-col width="70">
+                  <p class="likes">Vote: {{item.total_vote}} &nbsp;&nbsp; Komentar: {{item.total_comments}}</p>
+                </f7-col>
+                <f7-col width="30">
+                  <f7-chip v-if="item.status == 0" text="Pending" color="yellow" style="float: right;"></f7-chip>
+                  <f7-chip v-else-if="item.status == 1" text="Proses" color="blue" style="float: right;"></f7-chip>
+                  <f7-chip v-else-if="item.status == 2" text="Selesai" color="green" style="float: right;"></f7-chip>
+                  <f7-chip v-else text="Ditolak" color="red"></f7-chip>
+                </f7-col>
+              </f7-row>
+            </a>
+          </f7-card-content>
+          <f7-card-footer class="no-border">
+                <f7-link v-if="item.has_voted > 0" style="color: #2999F3; margin-left: 20px;" @click="deleteVote(item.votes_id)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
+                <f7-link v-else @click="vote(item.id)" style="margin-left: 20px;"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
+                <f7-link :href="'/comments/' + item.id"><f7-icon material="comment" size="20px"></f7-icon> Komentar</f7-link>
+                <f7-link @click="share(item)" style="margin-right: 20px;"><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
+            <!-- <f7-row>
+              <f7-col style="padding-left: 50px;">
+                <f7-link v-if="item.has_voted == 1" style="color: #2999F3" @click="deleteVote(item.votes_id)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
+                <f7-link v-else @click="vote(item.id)"><f7-icon material="thumb_up" size="20px"></f7-icon> Vote</f7-link>
+              </f7-col>
+              <f7-col style="padding-left: 50px;">
+                <f7-link :href="'/comments/' + item.id"><f7-icon material="comment" size="20px"></f7-icon> Komentar</f7-link>
+              </f7-col>
+              <f7-col>
+                <f7-link @click="share"><f7-icon material="share" size="20px"></f7-icon> Bagikan</f7-link>
+              </f7-col>
+            </f7-row> -->
+          </f7-card-footer>
+        </f7-card>
+      </div>
+      <div v-show="total == 0 && hasLoaded == true" style="padding-top: 300px;">
+        <center><span style="font-size: 17px; color: #8e8e93;">Tidak Ada Feed Baru.</span></center>
+      </div>
+      <center>
+        <f7-preloader v-show="showPreloader" style="margin-top: 30px;"></f7-preloader>
+      </center>
   </f7-page>
 </template>
 <script>
@@ -89,6 +95,8 @@ export default {
       lastTimeBackPress: 0,
       timePeriodToExit: 2000,
 
+      hasLoaded: false,
+
       // infinite scroll
       total: 0,
       page: 1, // pagination
@@ -104,7 +112,8 @@ export default {
       this.$f7.preloader.show()
       let baseURL = await axios().request()
       this.baseURL = baseURL.config.baseURL
-      let result = await axios().get('/report/home?limit=20&page=1')
+      let result = await axios().get('/report/home?limit=20&page=1');
+      this.hasLoaded = true;
       this.$f7.preloader.hide()
       console.log(result.data.data)
 
